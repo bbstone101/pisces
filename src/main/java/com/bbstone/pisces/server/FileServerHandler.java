@@ -81,7 +81,7 @@ public class FileServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
             log.info("********** startTime: {} ", startTime);
             sendChunk(ctx);
 
-        } else if (bFileBase instanceof BFileAck) {
+        } /*else if (bFileBase instanceof BFileAck) {
             BFileAck bFileAck = (BFileAck) bFileBase;
             if (bFileAck.getAck() == ConstUtil.ACK_OK || failCount >= 3) {
                 failCount = 0;
@@ -97,11 +97,11 @@ public class FileServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 sendChunk(ctx);
             }
 
-        }
+        }*/
     }
 
     private void sendChunk(ChannelHandlerContext ctx) {
-        if ((filelen - pos) > 0) {
+        while ((filelen - pos) > 0) {
             chunkSize = Math.min(ConstUtil.DEFAULT_CHUNK_SIZE, (filelen - pos));
             log.info("current pos: {}, will write {} bytes to channel.", pos, chunkSize);
 
@@ -114,11 +114,14 @@ public class FileServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
             // because every time new DefaultFileRegion, open a new raf
             ctx.write(new DefaultFileRegion(new File(filepath), pos, chunkSize));
 
-            log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", (chunkCounter+1), chunkSize, (pos + chunkSize), filelen);
+            chunkCounter++;
+            pos += chunkSize;
+
+            log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", chunkCounter, chunkSize, pos, filelen);
             ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
-        } else {
+        } /*else {
             log.info("all chunks sent.");
-        }
+        }*/
 
     }
 
