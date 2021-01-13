@@ -16,6 +16,10 @@
 
     <properties>
         <java.version>1.8</java.version>
+
+        <proto.version>3.11.0</proto.version>
+
+
     </properties>
 
     <dependencies>
@@ -39,6 +43,17 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${proto.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>${proto.version}</version>
         </dependency>
 
         <!-- config -->

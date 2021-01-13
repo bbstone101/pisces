@@ -17,7 +17,6 @@ import com.bbstone.pisces.util.BByteUtil;
  *
  */
 public class BFileRequest extends BFileBase {
-    private int cmd = BFileCmd.REQ;
 
     public BFileRequest() {
     }
@@ -30,11 +29,32 @@ public class BFileRequest extends BFileBase {
 
     @Override
     public int getCmd() {
-        return cmd;
+        return BFileCmd.REQ;
     }
 
     @Override
     public int size() {
         return baseSize();
+    }
+
+
+    @Override
+    public int getFilepathLen() {
+        return filepathLen;
+    }
+
+    @Override
+    public void setFilepathLen(int filepathLen) {
+        setFilepathLen(filepathLen);
+    }
+
+    @Override
+    public String getFilepath() {
+        return filepath;
+    }
+
+    @Override
+    public void setFilepath(String filepath) {
+        setFilepath(filepath);
     }
 }

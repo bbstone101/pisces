@@ -3,10 +3,16 @@ package com.bbstone.pisces.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.CharsetUtil;
+import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+@Slf4j
 public class BByteUtil {
 
     /** String -> byte[] */
@@ -95,6 +101,7 @@ public class BByteUtil {
         buffer.flip();//need flip
         return buffer.getLong();
     }
+
 
 
 

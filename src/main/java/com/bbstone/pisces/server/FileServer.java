@@ -15,7 +15,8 @@
  */
 package com.bbstone.pisces.server;
 
-import com.bbstone.pisces.proto.BFileCodecUtil;
+import com.bbstone.pisces.proto.BFileMsg;
+import com.bbstone.pisces.util.BFileCodecUtil;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -25,6 +26,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
@@ -55,10 +58,14 @@ public final class FileServer {
                             ChannelPipeline p = ch.pipeline();
                             ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
                             p.addLast(
+                                    // outbound
 //                                    new StringEncoder(CharsetUtil.UTF_8), // outbound
+
+                                    // inbound
 //                                    new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter), // inbound
                                     new DelimiterBasedFrameDecoder(8192, delimiter), // inbound
 //                                    new ChunkedWriteHandler(), // outbound
+                                    new ProtobufDecoder(BFileMsg.BFileReq.getDefaultInstance()), // inboud
                                     new FileServerHandler()); // inbound(String)
                         }
                     });

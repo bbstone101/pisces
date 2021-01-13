@@ -12,7 +12,7 @@ import com.bbstone.pisces.util.ConstUtil;
  */
 public abstract class BFileBase {
     // identify current transferred  stream is BFile
-    protected String magicCode = BByteUtil.magic(); //"BBSTONE_BFile";
+//    protected String magicCode = BByteUtil.magic(); //"BBSTONE_BFile";
     protected int cmd;
 
     // bytes of : /aa/tiandao01.mkv
@@ -22,21 +22,13 @@ public abstract class BFileBase {
     // filepath: /aa/tiandao01.mkv
     protected String filepath;
 
-    public String getMagicCode() {
-        return magicCode;
-    }
+//    public String getMagicCode() {
+//        return magicCode;
+//    }
 
-    public void setMagicCode(String magicCode) {
-        this.magicCode = magicCode;
-    }
-
-    public int getCmd() {
-        return cmd;
-    }
-
-    public void setCmd(int cmd) {
-        this.cmd = cmd;
-    }
+//    public void setMagicCode(String magicCode) {
+//        this.magicCode = magicCode;
+//    }
 
     public int getFilepathLen() {
         return filepathLen;
@@ -54,8 +46,11 @@ public abstract class BFileBase {
         this.filepath = filepath;
     }
 
-    public abstract int size();
     public int baseSize() {
-        return ConstUtil.magicLen + 4 + 4 + filepathLen;
+        return ConstUtil.magicLen + Integer.BYTES + Integer.BYTES + filepathLen;
     }
+
+    public abstract int size();
+
+    public abstract int getCmd();
 }

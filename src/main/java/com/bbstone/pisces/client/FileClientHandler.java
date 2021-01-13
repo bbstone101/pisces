@@ -1,11 +1,14 @@
 package com.bbstone.pisces.client;
 
-import com.bbstone.pisces.proto.BFileCodecUtil;
-import com.bbstone.pisces.proto.model.BFileAck;
+import com.bbstone.pisces.proto.BFileCmd;
+import com.bbstone.pisces.proto.BFileMsg;
+import com.bbstone.pisces.util.BFileCodecUtil;
 import com.bbstone.pisces.proto.model.BFileBase;
 import com.bbstone.pisces.proto.model.BFileRequest;
 import com.bbstone.pisces.proto.model.BFileResponse;
 import com.bbstone.pisces.util.ConstUtil;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,7 +34,7 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     //
 //    String path = "/Users/liguifa/temp-cli/cuizhu-000.jpg";
         String path = "/Users/liguifa/temp-cli/BeWater-000.mp4";
-//    String path = "/Users/liguifa/temp-cli/tiandao01-000.mkv";
+//        String path = "/Users/liguifa/temp-cli/tiandao01-000.mkv";
     FileOutputStream fos = null;
     //    long fileSize = 0;// 159305889; // tiandao01.mkv
     long recvSize = 0;
@@ -42,6 +45,8 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     int retry = 0;
 
     long startTime = 0;
+
+    BFileMsg.BFileRsp rsp = null;
 
     /**
      * Creates a client-side handler.
@@ -55,76 +60,78 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (Files.exists(Paths.get(path))) {
             Files.delete(Paths.get(path));
         }
-//        String data = srcPath + ConstUtil.delimiter;
-//        ctx.writeAndFlush(Unpooled.wrappedBuffer(data.getBytes(CharsetUtil.UTF_8)));
+        BFileMsg.BFileReq req = BFileMsg.BFileReq.newBuilder()
+                .setMagic(ConstUtil.magic)
+                .setCmd(BFileCmd.CMD_REQ)
+                .setFilepath(srcPath)
+                .setTs(System.currentTimeMillis())
+                .build();
 
-        BFileRequest bfile = new BFileRequest(srcPath);
-        ctx.write(BFileCodecUtil.encode(bfile));
+        ctx.write(req);
         ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
-        startTime = System.currentTimeMillis();
+//        startTime = System.currentTimeMillis();
     }
 
-    // txt file OK, but jpg not ok(ByteBuf -> String -> ByteBuf) lost something?
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        BFileBase bfileBase = BFileCodecUtil.decode(msg);
-        // client only recv BFileResponse
-        BFileResponse bfile = (BFileResponse) bfileBase;
+        log.info("client recv readableBytes: {}", msg.readableBytes());
 
-        // chunk data
-        int len = msg.readableBytes();
-        log.info("reading the {} chunk, recv chunk size: {}", (chunkCounter + 1), len);
+        BFileMsg.BFileRsp rsp = null;
+        byte[] chunkData = null;
+        // --------------- decode BFileRsp & chunkData
+        boolean isBFile = BFileCodecUtil.isBFileStream(msg);
+        if (isBFile) {
+            // decode bfile_info_len
+            int bfileInfoSize = msg.readInt();
+            // decode bfile_info
+            byte[] bfileInfoData = new byte[bfileInfoSize];
+            msg.readBytes(bfileInfoData);
+            try {
+                rsp = BFileMsg.BFileRsp.parseFrom(bfileInfoData);
+                // decode chunk data and set to rsp
+                int chunkSize = msg.readableBytes();
+                if (chunkSize == 0) {
+                    log.error("chunk data is 0.");
+                }
+                chunkData = new byte[chunkSize];
+                msg.readBytes(chunkData);
+                // not work set chunkData to rsp
+                //rsp.toBuilder().setFileChunkData(ByteString.copyFrom(chunkData));
 
-        /*if (retry >= 3) {
-            log.error("data decode error(send/recv len not match).");
-            throw new RuntimeException("data decode error(send/recv len not match, or recv 0 byte.).");
-        }*/
-
-        // server sent chunk size is 0, or incoming bytes size no eq chunk size
-        if (bfile.getChunkSize() == 0 || msg.readableBytes() != bfile.getChunkSize()) {
-            log.error("client recv chunk size is 0, or not match server sent(cli: {}, srv: {})", len, bfile.getChunkSize());
-            throw new RuntimeException("data decode error(send/recv len not match, or recv 0 byte.).");
-        }
-            /*retry++;
-            // send ack fail, server will send the chunk again
-            BFileAck bFileAck = new BFileAck(this.srcPath, ConstUtil.ACK_FAIL);
-            ctx.write(BFileCodecUtil.encode(bFileAck));
-            ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
-
-            return;
-        } else {*/
-
-            byte[] data = new byte[msg.readableBytes()];
-            msg.readBytes(data);
-            if (fos == null) {
-                fos = new FileOutputStream(new File(path), true);
+            } catch (InvalidProtocolBufferException e) {
+                log.error("parse BFileRs from stream error.", e);
+                throw new RuntimeException("parse BFileRs from stream error.");
             }
-            fos.write(data);
-            log.info("wrote current chunk to disk done.");
+        }
+        else {
+            throw new RuntimeException("recv data is not BFile format.");
+        }
+        // ---------------
+        int chunkLen = chunkData.length;
 
-            chunkCounter++;
-            recvSize += len;
+        if (fos == null) {
+            fos = new FileOutputStream(new File(path), true);
+        }
+        fos.write(chunkData);
+        log.info("wrote current chunk to disk done.");
 
-            /*BFileAck bFileAck = new BFileAck(this.srcPath, ConstUtil.ACK_OK);
-            ctx.write(BFileCodecUtil.encode(bFileAck));
-            ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
-            log.info("send ack OK to server for next chunk.");*/
-//        }
-
+        chunkCounter++;
+        recvSize += chunkLen;
+        log.info("recv chunkLen: {}, progress: {}/{}", chunkLen, recvSize, rsp.getFileSize());
         log.info("============ chunk recv done==========");
 
         // all file data received
-        if (recvSize > 0 && bfile.getDataLen() == recvSize) {
+        if (recvSize > 0 && rsp.getFileSize() == recvSize) {
             log.info("all bytes received, try to close fos.");
             if (fos != null)
                 fos.close();
             // check file integrity
             String checkSum = DigestUtils.md5DigestAsHex(new FileInputStream(path));
-            log.info("server checksum: {}, client checksum: {}, isEq: {}", bfile.getCheckSum(), checkSum, (bfile.getCheckSum().equals(checkSum)));
+            log.info("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
 
             long endTime = System.currentTimeMillis();
             log.info("============ endTime: {}==========", endTime);
 
-            log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", (endTime - startTime)/1000);
+            log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", (endTime - rsp.getReqTs()) / 1000);
         }
     }
 }

@@ -2,6 +2,10 @@ package com.bbstone.pisces.proto.model;
 
 import com.alibaba.fastjson.JSON;
 import com.bbstone.pisces.proto.BFileCmd;
+import lombok.Data;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
 
 /**
  * File header info(magicCode, filepath, checksum)
@@ -22,12 +26,8 @@ import com.bbstone.pisces.proto.BFileCmd;
  * ---------------------------------------------------------------------------------------
  *
  */
+@Data
 public class BFileResponse extends BFileBase {
-    // identify current trasfer stream is BFile
-//    private int magicCodeLen = BByteUtil.magicLen(); //"BBSTONE_BFile".getBytes(CharsetUtil.UTF_8).length;
-//    private String magicCode = BByteUtil.magic(); //"BBSTONE_BFile"
-
-    private int cmd = BFileCmd.RSP;
     //
     private int checkSumLen;
     private String checkSum;
@@ -57,69 +57,24 @@ public class BFileResponse extends BFileBase {
         this.chunkSize = chunkSize;
     }
 
-    public String getMagicCode() {
-        return this.magicCode;
+//    public String getMagicCode() {
+//        return this.magicCode;
+//    }
+
+
+    public String toString() {
+        return JSON.toJSONString(this);
     }
 
-    public int getFilepathLen() {
-        return filepathLen;
-    }
-
-    public void setFilepathLen(int filepathLen) {
-        this.filepathLen = filepathLen;
-    }
-
-    public String getFilepath() {
-        return filepath;
-    }
-
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
-    }
 
     @Override
     public int size() {
-        return baseSize() + 4 + checkSumLen + 8 + 8;
-    }
 
-    public int getCheckSumLen() {
-        return checkSumLen;
-    }
-
-    public void setCheckSumLen(int checkSumLen) {
-        this.checkSumLen = checkSumLen;
-    }
-
-    public String getCheckSum() {
-        return checkSum;
-    }
-
-    public void setCheckSum(String checkSum) {
-        this.checkSum = checkSum;
-    }
-
-    public long getDataLen() {
-        return dataLen;
-    }
-
-    public void setDataLen(long dataLen) {
-        this.dataLen = dataLen;
-    }
-
-    public long getChunkSize() {
-        return chunkSize;
-    }
-
-    public void setChunkSize(long chunkSize) {
-        this.chunkSize = chunkSize;
+        return baseSize() + Integer.BYTES + checkSumLen + Long.BYTES + Long.BYTES;
     }
 
     @Override
     public int getCmd() {
-        return cmd;
-    }
-
-    public String toString() {
-        return JSON.toJSONString(this);
+        return BFileCmd.RSP;
     }
 }

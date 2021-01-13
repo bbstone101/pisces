@@ -3,6 +3,7 @@ package com.bbstone.pisces.proto.model;
 
 import com.bbstone.pisces.proto.BFileCmd;
 import com.bbstone.pisces.util.BByteUtil;
+import lombok.Data;
 
 /**
  *
@@ -22,8 +23,8 @@ import com.bbstone.pisces.util.BByteUtil;
  * ----------------------------------------------
  *
  */
+@Data
 public class BFileAck extends BFileBase {
-    private int cmd = BFileCmd.RSP_ACK;
     private int ack;
 
     public BFileAck() {
@@ -35,21 +36,13 @@ public class BFileAck extends BFileBase {
         this.ack = ack;
     }
 
-    public int getAck() {
-        return ack;
-    }
-
-    public void setAck(int ack) {
-        this.ack = ack;
-    }
-
     @Override
     public int getCmd() {
-        return cmd;
+        return BFileCmd.RSP_ACK;
     }
 
     @Override
     public int size() {
-        return baseSize() + 4;
+        return baseSize() + Integer.BYTES;
     }
 }

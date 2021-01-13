@@ -18,12 +18,16 @@ package com.bbstone.pisces.server;
 
 import com.alibaba.fastjson.JSON;
 import com.bbstone.pisces.proto.BFileBuilder;
-import com.bbstone.pisces.proto.BFileCodecUtil;
-import com.bbstone.pisces.proto.model.BFileAck;
+import com.bbstone.pisces.proto.BFileCmd;
+import com.bbstone.pisces.proto.BFileMsg;
+import com.bbstone.pisces.util.BByteUtil;
+import com.bbstone.pisces.util.BFileCodecUtil;
 import com.bbstone.pisces.proto.model.BFileBase;
 import com.bbstone.pisces.proto.model.BFileRequest;
 import com.bbstone.pisces.proto.model.BFileResponse;
+import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.ConstUtil;
+import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -37,6 +41,8 @@ import org.springframework.util.DigestUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * cannot used ObjectEncoder/ObjectDecoder, because FileRegion write bytes to socket channel directly,
@@ -46,18 +52,15 @@ import java.io.RandomAccessFile;
  *
  */
 @Slf4j
-public class FileServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class FileServerHandler extends SimpleChannelInboundHandler<BFileMsg.BFileReq> {
+
+    // file content size of server file(which path is filepath)
+    long filelen = 0;
 
     int pos = 0;
     int chunkCounter = 0;
-    long filelen = 0;
-
-    String filepath = null;
-    String checkSum = null;
 
     long chunkSize = 0;
-
-    int failCount = 0;
 
 
     @Override
@@ -66,62 +69,109 @@ public class FileServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, BFileMsg.BFileReq msg) throws Exception {
+        log.info("filepath: {}", msg.getFilepath());
 
-        BFileBase bFileBase = BFileCodecUtil.decode(msg);
-        if (bFileBase instanceof BFileRequest) {
-            BFileRequest bFileRequest = (BFileRequest) bFileBase;
-            // initial and send the first chunk
-            this.filepath = bFileRequest.getFilepath();
-            this.checkSum = DigestUtils.md5DigestAsHex(new FileInputStream(filepath));
+        long reqTs = msg.getTs();
+        String filepath = msg.getFilepath();
+
+        if (Files.isDirectory(Paths.get(filepath))) {
+            listDir(ctx, filepath);
+        } else {
+            // send file
+            String checksum = DigestUtils.md5DigestAsHex(new FileInputStream(filepath));
             // note: The return value is unspecified if this pathname denotes a directory.
             this.filelen = new File(filepath).length();
-            //
-            long startTime = System.currentTimeMillis();
-            log.info("********** startTime: {} ", startTime);
-            sendChunk(ctx);
 
-        } /*else if (bFileBase instanceof BFileAck) {
-            BFileAck bFileAck = (BFileAck) bFileBase;
-            if (bFileAck.getAck() == ConstUtil.ACK_OK || failCount >= 3) {
-                failCount = 0;
-                log.info("send next chunk.....");
-                pos += chunkSize;
-                chunkCounter++;
-                // send next chunk
-                sendChunk(ctx);
-            } else {
-                failCount ++;
-                log.warn(" last chunk ack fail, try to send it again....");
-                // send previous chunk again(pos not increase)
-                sendChunk(ctx);
-            }
+            log.info("write BFileRsp to client......");
+            sendChunk(ctx, filepath, checksum, reqTs);
+        }
 
-        }*/
     }
 
-    private void sendChunk(ChannelHandlerContext ctx) {
+    private void listDir(ChannelHandlerContext ctx, String filepath) {
+        String fileTree = BFileUtil.list(filepath);
+        ctx.write(fileTree);
+        log.debug("fileTree: {} {}, {}", BFileUtil.LF, filepath, fileTree);
+        ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
+    }
+
+    /**
+     * data format:
+     * +---------------------------------------------------------------------------------+
+     * | bfile_info_prefix | bfile_info_bytes(int) | bfile_info | chunk_data | delimiter |
+     * +---------------------------------------------------------------------------------+
+     *
+     * bfile_info_prefix:
+     *
+     * @param ctx
+     * @param filepath -  server file path
+     * @param checksum -  file checksume
+     * @param reqTs - timestamp of client request this file
+     */
+    private void sendChunk(ChannelHandlerContext ctx, String filepath, String checksum, long reqTs) {
         while ((filelen - pos) > 0) {
+            // BFile info prefix
+            byte[] prefix = BByteUtil.toBytes(ConstUtil.bfile_info_prefix);
+            // BFile info
+            BFileMsg.BFileRsp rsp = BFileMsg.BFileRsp.newBuilder()
+                    .setMagic(ConstUtil.magic)
+                    .setCmd(BFileCmd.CMD_RSP)
+                    .setFilepath(filepath)
+                    .setFileSize(filelen)
+                    .setChecksum(checksum)
+//                    .setFileChunkData(ByteString.copyFrom("Hello".getBytes(CharsetUtil.UTF_8)))
+                    .setReqTs(reqTs)
+                    .setRspTs(System.currentTimeMillis())
+                    .build();
+            byte[] rspWithoutFileData = rsp.toByteArray();
+
+            int bfileInfoLen = rspWithoutFileData.length;
+            byte[] bifileInfoBytes = BByteUtil.toBytes(bfileInfoLen);
+
+            /**
+             * bytes size format:
+             * +----------------------------------------------------------------+
+             * | bfile_info_prefix_len | bfile_info_bytes(int) | bfile_info_len |
+             * +----------------------------------------------------------------+
+             *
+             */
+            // assemble data
+            int cpos = 0;
+            byte[] data = new byte[prefix.length + Integer.BYTES + rspWithoutFileData.length];
+            // bfile_info_prefix
+            System.arraycopy(prefix, 0, data, cpos, prefix.length);
+            // bfile_info size
+            cpos += prefix.length;
+            System.arraycopy(bifileInfoBytes, 0, data, cpos, Integer.BYTES);
+            // bfile_info
+            cpos += Integer.BYTES;
+            System.arraycopy(rspWithoutFileData, 0, data, cpos, rspWithoutFileData.length);
+
+            log.info("data.len: {}, bytes: {}", data.length, data.toString());
+            ctx.write(Unpooled.wrappedBuffer(data));
+
+
+            /**
+             * appending send following data to channel directly(not assemble to full data format because
+             * FileRegion not support extract data (TBD)
+             *
+             * +-------------------------------------
+             * | chunk_data | delimiter |
+             * +-------------------------------------
+             */
             chunkSize = Math.min(ConstUtil.DEFAULT_CHUNK_SIZE, (filelen - pos));
             log.info("current pos: {}, will write {} bytes to channel.", pos, chunkSize);
-
-            BFileResponse bfile = BFileBuilder.buildRsp(filepath, checkSum, filelen, chunkSize);
-            log.info("server bfile: {}", JSON.toJSONString(bfile));
-            ByteBuf cbuf = BFileCodecUtil.encode(bfile);
-            ctx.write(cbuf);
-
             // DefaultFileRegion need to pass new File(filepath) other than raf.getChannel(),
             // because every time new DefaultFileRegion, open a new raf
             ctx.write(new DefaultFileRegion(new File(filepath), pos, chunkSize));
+            ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
 
             chunkCounter++;
             pos += chunkSize;
-
             log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", chunkCounter, chunkSize, pos, filelen);
-            ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
-        } /*else {
-            log.info("all chunks sent.");
-        }*/
+
+        }
 
     }
 
