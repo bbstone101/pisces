@@ -1024,10 +1024,10 @@ public final class BFileMsg {
         getRspDataBytes();
 
     /**
-     * <code>bytes fileChunkData = 7;</code>
-     * @return The fileChunkData.
+     * <code>bytes chunkData = 7;</code>
+     * @return The chunkData.
      */
-    com.google.protobuf.ByteString getFileChunkData();
+    com.google.protobuf.ByteString getChunkData();
 
     /**
      * <code>uint64 reqTs = 8;</code>
@@ -1059,7 +1059,7 @@ public final class BFileMsg {
       filepath_ = "";
       checksum_ = "";
       rspData_ = "";
-      fileChunkData_ = com.google.protobuf.ByteString.EMPTY;
+      chunkData_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -1129,7 +1129,7 @@ public final class BFileMsg {
             }
             case 58: {
 
-              fileChunkData_ = input.readBytes();
+              chunkData_ = input.readBytes();
               break;
             }
             case 64: {
@@ -1375,15 +1375,15 @@ public final class BFileMsg {
       }
     }
 
-    public static final int FILECHUNKDATA_FIELD_NUMBER = 7;
-    private com.google.protobuf.ByteString fileChunkData_;
+    public static final int CHUNKDATA_FIELD_NUMBER = 7;
+    private com.google.protobuf.ByteString chunkData_;
     /**
-     * <code>bytes fileChunkData = 7;</code>
-     * @return The fileChunkData.
+     * <code>bytes chunkData = 7;</code>
+     * @return The chunkData.
      */
     @java.lang.Override
-    public com.google.protobuf.ByteString getFileChunkData() {
-      return fileChunkData_;
+    public com.google.protobuf.ByteString getChunkData() {
+      return chunkData_;
     }
 
     public static final int REQTS_FIELD_NUMBER = 8;
@@ -1440,8 +1440,8 @@ public final class BFileMsg {
       if (!getRspDataBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 6, rspData_);
       }
-      if (!fileChunkData_.isEmpty()) {
-        output.writeBytes(7, fileChunkData_);
+      if (!chunkData_.isEmpty()) {
+        output.writeBytes(7, chunkData_);
       }
       if (reqTs_ != 0L) {
         output.writeUInt64(8, reqTs_);
@@ -1477,9 +1477,9 @@ public final class BFileMsg {
       if (!getRspDataBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, rspData_);
       }
-      if (!fileChunkData_.isEmpty()) {
+      if (!chunkData_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(7, fileChunkData_);
+          .computeBytesSize(7, chunkData_);
       }
       if (reqTs_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
@@ -1516,8 +1516,8 @@ public final class BFileMsg {
           .equals(other.getChecksum())) return false;
       if (!getRspData()
           .equals(other.getRspData())) return false;
-      if (!getFileChunkData()
-          .equals(other.getFileChunkData())) return false;
+      if (!getChunkData()
+          .equals(other.getChunkData())) return false;
       if (getReqTs()
           != other.getReqTs()) return false;
       if (getRspTs()
@@ -1546,8 +1546,8 @@ public final class BFileMsg {
       hash = (53 * hash) + getChecksum().hashCode();
       hash = (37 * hash) + RSPDATA_FIELD_NUMBER;
       hash = (53 * hash) + getRspData().hashCode();
-      hash = (37 * hash) + FILECHUNKDATA_FIELD_NUMBER;
-      hash = (53 * hash) + getFileChunkData().hashCode();
+      hash = (37 * hash) + CHUNKDATA_FIELD_NUMBER;
+      hash = (53 * hash) + getChunkData().hashCode();
       hash = (37 * hash) + REQTS_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getReqTs());
@@ -1699,7 +1699,7 @@ public final class BFileMsg {
 
         rspData_ = "";
 
-        fileChunkData_ = com.google.protobuf.ByteString.EMPTY;
+        chunkData_ = com.google.protobuf.ByteString.EMPTY;
 
         reqTs_ = 0L;
 
@@ -1737,7 +1737,7 @@ public final class BFileMsg {
         result.fileSize_ = fileSize_;
         result.checksum_ = checksum_;
         result.rspData_ = rspData_;
-        result.fileChunkData_ = fileChunkData_;
+        result.chunkData_ = chunkData_;
         result.reqTs_ = reqTs_;
         result.rspTs_ = rspTs_;
         onBuilt();
@@ -1811,8 +1811,8 @@ public final class BFileMsg {
           rspData_ = other.rspData_;
           onChanged();
         }
-        if (other.getFileChunkData() != com.google.protobuf.ByteString.EMPTY) {
-          setFileChunkData(other.getFileChunkData());
+        if (other.getChunkData() != com.google.protobuf.ByteString.EMPTY) {
+          setChunkData(other.getChunkData());
         }
         if (other.getReqTs() != 0L) {
           setReqTs(other.getReqTs());
@@ -2260,36 +2260,36 @@ public final class BFileMsg {
         return this;
       }
 
-      private com.google.protobuf.ByteString fileChunkData_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString chunkData_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>bytes fileChunkData = 7;</code>
-       * @return The fileChunkData.
+       * <code>bytes chunkData = 7;</code>
+       * @return The chunkData.
        */
       @java.lang.Override
-      public com.google.protobuf.ByteString getFileChunkData() {
-        return fileChunkData_;
+      public com.google.protobuf.ByteString getChunkData() {
+        return chunkData_;
       }
       /**
-       * <code>bytes fileChunkData = 7;</code>
-       * @param value The fileChunkData to set.
+       * <code>bytes chunkData = 7;</code>
+       * @param value The chunkData to set.
        * @return This builder for chaining.
        */
-      public Builder setFileChunkData(com.google.protobuf.ByteString value) {
+      public Builder setChunkData(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        fileChunkData_ = value;
+        chunkData_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>bytes fileChunkData = 7;</code>
+       * <code>bytes chunkData = 7;</code>
        * @return This builder for chaining.
        */
-      public Builder clearFileChunkData() {
+      public Builder clearChunkData() {
         
-        fileChunkData_ = getDefaultInstance().getFileChunkData();
+        chunkData_ = getDefaultInstance().getChunkData();
         onChanged();
         return this;
       }
@@ -2429,13 +2429,13 @@ public final class BFileMsg {
     java.lang.String[] descriptorData = {
       "\n\016BFileMsg.proto\022\030com.bbstone.pisces.pro" +
       "to\"D\n\010BFileReq\022\r\n\005magic\030\001 \001(\t\022\013\n\003cmd\030\002 \001" +
-      "(\t\022\020\n\010filepath\030\003 \001(\t\022\n\n\002ts\030\004 \001(\004\"\242\001\n\010BFi" +
+      "(\t\022\020\n\010filepath\030\003 \001(\t\022\n\n\002ts\030\004 \001(\004\"\236\001\n\010BFi" +
       "leRsp\022\r\n\005magic\030\001 \001(\t\022\013\n\003cmd\030\002 \001(\t\022\020\n\010fil" +
       "epath\030\003 \001(\t\022\020\n\010fileSize\030\004 \001(\004\022\020\n\010checksu" +
-      "m\030\005 \001(\t\022\017\n\007rspData\030\006 \001(\t\022\025\n\rfileChunkDat" +
-      "a\030\007 \001(\014\022\r\n\005reqTs\030\010 \001(\004\022\r\n\005rspTs\030\t \001(\004B&\n" +
-      "\030com.bbstone.pisces.protoB\010BFileMsgH\001b\006p" +
-      "roto3"
+      "m\030\005 \001(\t\022\017\n\007rspData\030\006 \001(\t\022\021\n\tchunkData\030\007 " +
+      "\001(\014\022\r\n\005reqTs\030\010 \001(\004\022\r\n\005rspTs\030\t \001(\004B&\n\030com" +
+      ".bbstone.pisces.protoB\010BFileMsgH\001b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2452,7 +2452,7 @@ public final class BFileMsg {
     internal_static_com_bbstone_pisces_proto_BFileRsp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_bbstone_pisces_proto_BFileRsp_descriptor,
-        new java.lang.String[] { "Magic", "Cmd", "Filepath", "FileSize", "Checksum", "RspData", "FileChunkData", "ReqTs", "RspTs", });
+        new java.lang.String[] { "Magic", "Cmd", "Filepath", "FileSize", "Checksum", "RspData", "ChunkData", "ReqTs", "RspTs", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

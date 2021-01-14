@@ -16,7 +16,7 @@
 package com.bbstone.pisces.server;
 
 import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.BFileCodecUtil;
+import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -27,7 +27,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
-import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
@@ -42,7 +41,7 @@ public final class FileServer {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8992" : "8080"));
 
     public static void main(String[] args) throws Exception {
-        BFileCodecUtil.init();
+        CmdRegister.init();
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();

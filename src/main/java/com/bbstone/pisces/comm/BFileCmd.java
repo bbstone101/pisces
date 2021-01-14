@@ -1,4 +1,4 @@
-package com.bbstone.pisces.proto;
+package com.bbstone.pisces.comm;
 
 public interface BFileCmd {
 
@@ -13,7 +13,11 @@ public interface BFileCmd {
 
     public static final int LIST = 4;
 
-    public static final String CMD_REQ = "CMD_REQ";
-    public static final String CMD_RSP = "CMD_RSP";
-    public static final String CMD_LIST = "CMD_LIST";
+    // server register request command
+    public static final String REQ_FILE = "REQ_FILE";
+    public static final String REQ_LIST = "REQ_LIST";
+
+    // client register rsp commands
+    public static final String RSP_FILE = "RSP_FILE";
+    public static final String RSP_LIST = "RSP_LIST";
 }

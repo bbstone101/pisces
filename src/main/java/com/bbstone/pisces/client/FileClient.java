@@ -15,8 +15,6 @@
  */
 package com.bbstone.pisces.client;
 
-import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.BFileCodecUtil;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -26,10 +24,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.util.CharsetUtil;
 
 /**
@@ -46,7 +41,7 @@ public final class FileClient {
     static final int SIZE = Integer.parseInt(System.getProperty("size", "256"));
 
     public static void main(String[] args) throws Exception {
-        BFileCodecUtil.init();
+        ClientCmdRegister.init();
         // Configure the client.
         EventLoopGroup group = new NioEventLoopGroup();
         try {

@@ -4,6 +4,7 @@ import io.netty.util.CharsetUtil;
 
 public class ConstUtil {
 
+    public static final String EMPTY_STR = "";
     public static final String magic = "BBSTONE_BFile";
     public static final int magicLen = magic.getBytes(CharsetUtil.UTF_8).length;
 
