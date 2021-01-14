@@ -1,7 +1,10 @@
 package com.bbstone.pisces.util;
 
+import com.twmacinta.util.MD5;
 import io.netty.util.CharsetUtil;
 import org.springframework.util.DigestUtils;
+
+import java.io.File;
 
 public class TestMain {
     public static void main(String[] args) {
@@ -22,6 +25,10 @@ public class TestMain {
 //        System.out.println(BByteUtil.getObjByteSize(bFileRequest));
 
         System.out.println(Math.round(-1.5));
+
+        String filename = "/Users/liguifa/Downloads/test/Dragon1972.mp4";
+        // TODO upgrade to 2.7.1 will suport getHash(File) method
+//        String hash = MD5.asHex(MD5.getHash(new File(filename)));
 
     }
 }

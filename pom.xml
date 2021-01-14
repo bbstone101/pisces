@@ -44,6 +44,12 @@
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
         </dependency>
+        <dependency>
+            <groupId>fast-md5</groupId>
+            <artifactId>fast-md5</artifactId>
+            <version>2.5</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.google.protobuf</groupId>

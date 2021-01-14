@@ -111,7 +111,34 @@ public class BFileUtil {
      */
     public static String getCliFilepath(String filepath) {
         String relativePath = filepath.substring(Config.serverDir.length());
-        return Config.clientDir + relativePath;
+        String clipath = Config.clientDir + relativePath;
+        checkPath(clipath);
+        return clipath;
+    }
+
+    private static void checkPath(String clipath) {
+        String dirpath = null;
+        if (Files.isDirectory(Paths.get(clipath))) {
+            dirpath = clipath;
+        } else {
+            dirpath = clipath.substring(0, clipath.lastIndexOf(System.getProperty("file.separator")));
+        }
+        mkdir(dirpath);
+    }
+
+    /**
+     * create directory
+     * @param dirpath -  a directory path
+     */
+    private static void mkdir(String dirpath) {
+        if (Files.notExists(Paths.get(dirpath))) {
+            try {
+                Files.createDirectory(Paths.get(dirpath));
+                log.info(">>>>>>>>>>>>>> created dir: {}", dirpath);
+            } catch (IOException e) {
+                log.error("dir create fail. ", e);
+            }
+        }
     }
 
     /**
@@ -166,7 +193,11 @@ public class BFileUtil {
      * @return
      */
     public static ByteBuf buildRspFile(String filepath, long filesize, String checksum, long reqTs) {
-        return buildBFileReq(BFileCmd.RSP_FILE, filepath, filesize, checksum, null, null, reqTs);
+        return buildRsp(BFileCmd.RSP_FILE, filepath, filesize, checksum, null, null, reqTs);
+    }
+
+    public static ByteBuf buildRspDir(String filepath, long reqTs) {
+        return buildRsp(BFileCmd.RSP_DIR, filepath, 0, ConstUtil.EMPTY_STR, null, null, reqTs);
     }
 
     /**
@@ -179,7 +210,7 @@ public class BFileUtil {
     public static ByteBuf buildRspList(String filepath, String rspData, long reqTs) {
         // checksum: rspData 's md5 hash
         String checksum = DigestUtils.md5DigestAsHex(BByteUtil.toBytes(rspData));
-        return buildBFileReq(BFileCmd.RSP_LIST, filepath, 0, checksum, rspData, null, reqTs);
+        return buildRsp(BFileCmd.RSP_LIST, filepath, 0, checksum, rspData, null, reqTs);
     }
 
 
@@ -218,7 +249,7 @@ public class BFileUtil {
      * @param reqTs
      * @return
      */
-    private static ByteBuf buildBFileReq(String cmd, String filepath, long filesize, String checksum, String rspData, byte[] chunkData, long reqTs) {
+    private static ByteBuf buildRsp(String cmd, String filepath, long filesize, String checksum, String rspData, byte[] chunkData, long reqTs) {
         // BFile info prefix
         byte[] prefix = BByteUtil.toBytes(ConstUtil.bfile_info_prefix);
         // BFile info

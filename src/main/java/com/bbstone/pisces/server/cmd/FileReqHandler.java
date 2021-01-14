@@ -1,5 +1,6 @@
 package com.bbstone.pisces.server.cmd;
 
+import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.ConstUtil;
@@ -42,9 +43,28 @@ public class FileReqHandler implements CmdHandler {
         for (File subfile : flist) {
             if (subfile.isDirectory()) {
                 sendDir(ctx, subfile, reqTs);
+//                doSendDir(ctx, subfile.getAbsolutePath(), reqTs);
             }
+            log.info("searching.... {} ......", subfile.getAbsolutePath());
             sendFile(ctx, subfile.getAbsolutePath(), reqTs);
         }
+    }
+
+    private void doSendDir(ChannelHandlerContext ctx, String filepath, long reqTs) {
+        log.info("===|==|===|===|====dir: {}", filepath);
+        if (Config.serverDir.equals(filepath)) {
+            return;
+        }
+        /**
+         * Standard Rsp format like:
+         * +--------------------------------------------------------+
+         * | bfile_info_prefix | bfile_info_bytes(int) | bfile_info |
+         * +--------------------------------------------------------+
+         * <p>
+         */
+        ByteBuf rspBuf = BFileUtil.buildRspDir(filepath, reqTs);
+        ctx.write(rspBuf);
+        ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
     }
 
     /**
@@ -58,15 +78,18 @@ public class FileReqHandler implements CmdHandler {
      *
      * @param ctx
      * @param filepath -  server file path
-     * @param checksum -  file checksume
-     * @param filelen -  file content size of server file(which path is filepath)
      * @param reqTs    - timestamp of client request this file
      */
     private void sendFile(ChannelHandlerContext ctx, String filepath, long reqTs) {
-        // send file
+        log.info(">>>>>>>>>> sending file/dir: {}", filepath);
+        if (Files.isDirectory(Paths.get(filepath))) {
+            doSendDir(ctx, filepath, reqTs);
+            return;
+        }
+        // file checksume
         String checksum = BFileUtil.checksum(filepath);
 
-        // note: The return value is unspecified if this pathname denotes a directory.
+        // file content size of server file(which path is filepath)
         long filelen = new File(filepath).length();
         log.info("filelen: {}, write BFileRsp to client......", filelen);
 

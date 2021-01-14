@@ -5,10 +5,8 @@ import com.bbstone.pisces.util.BFileUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.DigestUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -40,16 +38,15 @@ public class FileRspHandler implements CmdHandler {
         int chunkLen = chunkData.length;
 
         try {
-            if (fos == null) {
-                String filepath = rsp.getFilepath();
-                clipath = BFileUtil.getCliFilepath(filepath);
-                temppath = BFileUtil.getCliTempFilepath(clipath);
-                log.info("*********clipath: {}, temppath: {}*********", clipath, temppath);
-                tempfile = new File(temppath);
-                fos = new FileOutputStream(tempfile, true);
-            }
-            fos.write(chunkData);
+            String filepath = rsp.getFilepath();
+            clipath = BFileUtil.getCliFilepath(filepath);
+            temppath = BFileUtil.getCliTempFilepath(clipath);
+            log.info("*********clipath: {}, temppath: {}*********", clipath, temppath);
+            tempfile = new File(temppath);
 
+            FileOutputStream fos = new FileOutputStream(tempfile, true);
+            fos.write(chunkData);
+            fos.close();
             log.info("wrote current chunk to disk done.");
 
             chunkCounter++;
@@ -60,10 +57,10 @@ public class FileRspHandler implements CmdHandler {
             // all file data received
             if (recvSize > 0 && rsp.getFileSize() == recvSize) {
                 log.info("all bytes received, try to close fos.");
-                if (fos != null)
-                    fos.close();
+                recvSize = 0; // reset counter
+
                 // check file integrity
-                String checkSum = DigestUtils.md5DigestAsHex(new FileInputStream(temppath));
+                String checkSum = BFileUtil.checksum(temppath);
                 log.info("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
 
                 if (rsp.getChecksum().equals(checkSum)) {

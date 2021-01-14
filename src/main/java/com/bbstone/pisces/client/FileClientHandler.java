@@ -17,10 +17,10 @@ import java.nio.file.Paths;
 @Slf4j
 public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     //    private final ByteBuf firstMessage;
-    String srcPath = "/Users/liguifa/Downloads/test/cuizhu.jpg";
+//    String srcPath = "/Users/liguifa/Downloads/test/cuizhu.jpg";
 //    String srcPath = "/Users/liguifa/Downloads/test/tiandao01.mkv";
 //    String srcPath = "/Users/liguifa/Downloads/test/BeWater.mp4";
-//    String srcPath = "/Users/liguifa/Downloads/test";
+    String srcPath = "/Users/liguifa/Downloads/test";
 
 
     //
@@ -42,7 +42,8 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         BFileMsg.BFileReq req = null;
         if (Files.isDirectory(Paths.get(srcPath))) {
             // ListReq
-            req = BFileUtil.buildReq(BFileCmd.RSP_LIST, srcPath);
+//            req = BFileUtil.buildReq(BFileCmd.RSP_LIST, srcPath);
+            req = BFileUtil.buildReq(BFileCmd.REQ_FILE, srcPath);
 
         } else {
             String clipath = BFileUtil.getCliFilepath(srcPath);

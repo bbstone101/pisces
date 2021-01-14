@@ -19,5 +19,6 @@ public interface BFileCmd {
 
     // client register rsp commands
     public static final String RSP_FILE = "RSP_FILE";
+    public static final String RSP_DIR = "RSP_DIR";
     public static final String RSP_LIST = "RSP_LIST";
 }
