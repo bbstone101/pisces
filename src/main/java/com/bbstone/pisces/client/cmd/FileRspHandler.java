@@ -2,6 +2,7 @@ package com.bbstone.pisces.client.cmd;
 
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
+import com.bbstone.pisces.util.CtxUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -41,26 +42,32 @@ public class FileRspHandler implements CmdHandler {
             String filepath = rsp.getFilepath();
             clipath = BFileUtil.getCliFilepath(filepath);
             temppath = BFileUtil.getCliTempFilepath(clipath);
-            log.info("*********clipath: {}, temppath: {}*********", clipath, temppath);
+            log.info("filepath: {}, clipath: {}, temppath: {}", filepath, clipath, temppath);
             tempfile = new File(temppath);
 
-            FileOutputStream fos = new FileOutputStream(tempfile, true);
+            if (fos == null) {
+                fos = new FileOutputStream(tempfile, true);
+            }
+//            FileOutputStream fos = new FileOutputStream(tempfile, true);
             fos.write(chunkData);
-            fos.close();
             log.info("wrote current chunk to disk done.");
 
             chunkCounter++;
             recvSize += chunkLen;
-            log.info("recv chunkLen: {}, progress: {}/{}", chunkLen, recvSize, rsp.getFileSize());
+            log.info("recv the {} chunk, chunkLen: {}, progress: {}/{}", chunkCounter, chunkLen, recvSize, rsp.getFileSize());
             log.info("============ chunk recv done==========");
 
             // all file data received
             if (recvSize > 0 && rsp.getFileSize() == recvSize) {
                 log.info("all bytes received, try to close fos.");
                 recvSize = 0; // reset counter
+                chunkCounter = 0;
+                if (fos != null)
+                    fos.close();
+                fos = null;
 
                 // check file integrity
-                String checkSum = BFileUtil.checksum(temppath);
+                String checkSum = BFileUtil.checksum(new File(temppath));
                 log.info("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
 
                 if (rsp.getChecksum().equals(checkSum)) {
@@ -71,9 +78,27 @@ public class FileRspHandler implements CmdHandler {
 
                 long costTime = (endTime - rsp.getReqTs()) / 1000;
                 log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
+
+                // request next file
+                String nextFile = CtxUtil.reqNextFile(ctx);
+                log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
+                if (nextFile == null) {
+                    log.info("all files received, try to stop client.");
+                    System.exit(0);
+                }
+//                String nextServerFullPath = CtxUtil.reqNextFile(ctx);
+//                String partFilePath = BFileUtil.getPartFileFromFull(nextServerFullPath);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("save file error.", e);
+        } finally {
+            /*if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }*/
         }
     }
 

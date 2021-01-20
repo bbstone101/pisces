@@ -15,6 +15,7 @@
  */
 package com.bbstone.pisces.server;
 
+import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.ConstUtil;
@@ -35,10 +36,13 @@ import io.netty.util.CharsetUtil;
  * Server that accept the path of a file an echo back its content.
  */
 public final class FileServer {
+    /*
 
-    static final boolean SSL = System.getProperty("ssl") != null;
-    // Use the same default port with the telnet example so that we can use the telnet client example to access it.
-    static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8992" : "8080"));
+        static final boolean SSL = System.getProperty("ssl") != null;
+        // Use the same default port with the telnet example so that we can use the telnet client example to access it.
+        static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8992" : "8080"));
+    */
+    static final int PORT = Config.port;
 
     public static void main(String[] args) throws Exception {
         CmdRegister.init();

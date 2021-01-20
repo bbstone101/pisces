@@ -15,6 +15,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 public class FileReqHandler implements CmdHandler {
@@ -23,18 +24,31 @@ public class FileReqHandler implements CmdHandler {
     public void handle(ChannelHandlerContext ctx, BFileMsg.BFileReq msg) {
         log.info("filepath: {}", msg.getFilepath());
         long reqTs = msg.getTs();
+        // TODO filepath should be relative path of server.dir send by client,
+        // so the first request from client should be CMD_LIST to get server.dir file list
         String filepath = msg.getFilepath();
+        String serverpath = BFileUtil.getServerDir() + filepath;
 
-        if (Files.notExists(Paths.get(filepath))) {
-            log.error("not found file in filepath: {}", filepath);
+        if (Files.notExists(Paths.get(serverpath))) {
+            log.error("not found file in serverpath: {}", serverpath);
             return;
         }
 
-        if (Files.isDirectory(Paths.get(filepath))) {
-            sendDir(ctx, new File(filepath), reqTs);
-        } else {
-            sendFile(ctx, filepath, reqTs);
+        sendFile(ctx, serverpath, reqTs);
+        log.info("------> server done sent file: {}", serverpath);
+/*
+        List<String> fileList = BFileUtil.findFiles(serverpath);
+        for (String file : fileList) {
+            sendFile(ctx, file, reqTs);
+            log.info("------> server done sent file: {}", file);
         }
+
+        if (Files.isDirectory(Paths.get(serverpath))) {
+            sendDir(ctx, new File(serverpath), reqTs);
+        } else {
+            sendFile(ctx, serverpath, reqTs);
+        }
+        */
     }
 
     private void sendDir(ChannelHandlerContext ctx, File file, long reqTs) {
@@ -50,9 +64,9 @@ public class FileReqHandler implements CmdHandler {
         }
     }
 
-    private void doSendDir(ChannelHandlerContext ctx, String filepath, long reqTs) {
-        log.info("===|==|===|===|====dir: {}", filepath);
-        if (Config.serverDir.equals(filepath)) {
+    private void doSendDir(ChannelHandlerContext ctx, String serverpath, long reqTs) {
+        log.info("===|==|===|===|====dir: {}", serverpath);
+        if (Config.serverDir.equals(serverpath)) {
             return;
         }
         /**
@@ -62,7 +76,7 @@ public class FileReqHandler implements CmdHandler {
          * +--------------------------------------------------------+
          * <p>
          */
-        ByteBuf rspBuf = BFileUtil.buildRspDir(filepath, reqTs);
+        ByteBuf rspBuf = BFileUtil.buildRspDir(serverpath, reqTs);
         ctx.write(rspBuf);
         ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
     }
@@ -77,20 +91,20 @@ public class FileReqHandler implements CmdHandler {
      * <p>
      *
      * @param ctx
-     * @param filepath -  server file path
+     * @param serverpath -  server file full path
      * @param reqTs    - timestamp of client request this file
      */
-    private void sendFile(ChannelHandlerContext ctx, String filepath, long reqTs) {
-        log.info(">>>>>>>>>> sending file/dir: {}", filepath);
-        if (Files.isDirectory(Paths.get(filepath))) {
-            doSendDir(ctx, filepath, reqTs);
+    private void sendFile(ChannelHandlerContext ctx, String serverpath, long reqTs) {
+        log.info(">>>>>>>>>> sending file/dir: {}", serverpath);
+        if (Files.isDirectory(Paths.get(serverpath))) {
+            doSendDir(ctx, serverpath, reqTs);
             return;
         }
         // file checksume
-        String checksum = BFileUtil.checksum(filepath);
+        String checksum = BFileUtil.checksum(new File(serverpath));
 
         // file content size of server file(which path is filepath)
-        long filelen = new File(filepath).length();
+        long filelen = new File(serverpath).length();
         log.info("filelen: {}, write BFileRsp to client......", filelen);
 
         // ------------ send file chunk by chunk
@@ -105,7 +119,8 @@ public class FileReqHandler implements CmdHandler {
              * +--------------------------------------------------------+
              * <p>
              */
-            ByteBuf rspBuf = BFileUtil.buildRspFile(filepath, filelen, checksum, reqTs);
+            ByteBuf rspBuf = BFileUtil.buildRspFile(serverpath, filelen, checksum, reqTs);
+            int rspInfoLen = rspBuf.readableBytes();
             ctx.write(rspBuf);
             /**
              * Non-standard format:
@@ -120,12 +135,12 @@ public class FileReqHandler implements CmdHandler {
             log.info("current pos: {}, will write {} bytes to channel.", pos, chunkSize);
             // DefaultFileRegion need to pass new File(filepath) other than raf.getChannel(),
             // because every time new DefaultFileRegion, open a new raf
-            ctx.write(new DefaultFileRegion(new File(filepath), pos, chunkSize));
+            ctx.write(new DefaultFileRegion(new File(serverpath), pos, chunkSize));
             ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
-
+            log.info("output file: {}", serverpath);
             chunkCounter++;
             pos += chunkSize;
-            log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", chunkCounter, chunkSize, pos, filelen);
+            log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", chunkCounter, (rspInfoLen+chunkSize), pos, filelen);
 
         }
 

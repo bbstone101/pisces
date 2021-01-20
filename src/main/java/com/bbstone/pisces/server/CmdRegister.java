@@ -14,7 +14,7 @@ public class CmdRegister {
 
     public static void init() {
         register(BFileCmd.REQ_FILE, new FileReqHandler());
-        register(BFileCmd.RSP_LIST, new ListReqHandler());
+        register(BFileCmd.REQ_LIST, new ListReqHandler());
 
 
     }

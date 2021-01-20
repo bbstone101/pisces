@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RspDispatcher {
 
     public static void dispatch(ChannelHandlerContext ctx, ByteBuf msg) {
-        log.info("client recv readableBytes: {}", msg.readableBytes());
+        log.info("[in dispatch] -> client recv readableBytes: {}", msg.readableBytes());
 
         BFileMsg.BFileRsp rsp = null;
         // --------------- decode BFileRsp & chunkData

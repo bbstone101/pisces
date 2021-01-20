@@ -1,5 +1,6 @@
 package com.bbstone.pisces.server.cmd;
 
+import com.alibaba.fastjson.JSON;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.ConstUtil;
@@ -8,6 +9,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 public class ListReqHandler implements CmdHandler {
@@ -29,11 +32,19 @@ public class ListReqHandler implements CmdHandler {
      *
      */
     private void listDir(ChannelHandlerContext ctx, String filepath, long reqTs) {
+        /*
         String fileTree = BFileUtil.list(filepath);
         ctx.write(fileTree);
         log.debug("fileTree: {} {}, {}", BFileUtil.LF, filepath, fileTree);
-
         ByteBuf rspBuf = BFileUtil.buildRspList(filepath, fileTree, reqTs);
+        ctx.write(rspBuf);
+        ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
+        */
+
+        String serverFullPath = BFileUtil.getServerDir() + filepath;
+        List<String> fileList = BFileUtil.findFiles(serverFullPath);
+        String filesJson = JSON.toJSONString(fileList);
+        ByteBuf rspBuf = BFileUtil.buildRspList(serverFullPath, filesJson, reqTs);
         ctx.write(rspBuf);
         ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
     }

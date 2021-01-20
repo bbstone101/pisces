@@ -2,7 +2,6 @@ package com.bbstone.pisces.config;
 
 import java.io.File;
 
-import com.bbstone.pisces.util.CipherUtil;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;

@@ -15,6 +15,7 @@
  */
 package com.bbstone.pisces.client;
 
+import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -34,11 +35,14 @@ import io.netty.util.CharsetUtil;
  * the server.
  */
 public final class FileClient {
-
-    static final boolean SSL = System.getProperty("ssl") != null;
-    static final String HOST = System.getProperty("host", "127.0.0.1");
-    static final int PORT = Integer.parseInt(System.getProperty("port", "8080"));
-    static final int SIZE = Integer.parseInt(System.getProperty("size", "256"));
+    /*
+        static final boolean SSL = System.getProperty("ssl") != null;
+        static final String HOST = System.getProperty("host", "127.0.0.1");
+        static final int PORT = Integer.parseInt(System.getProperty("port", "8080"));
+        static final int SIZE = Integer.parseInt(System.getProperty("size", "256"));
+        */
+    static final String HOST = Config.host;
+    static final int PORT = Config.port;
 
     public static void main(String[] args) throws Exception {
         ClientCmdRegister.init();
@@ -58,9 +62,9 @@ public final class FileClient {
                             p.addLast(new ProtobufEncoder());
 
                             // inbound
-                             // ----- decode and handle FileRegion data stream
-//                            p.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter)); // chunkedFile default is 8192, but delimiter ctontains 3 chars
-                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter)); // chunkedFile default is 8192, but delimiter ctontains 3 chars
+                            // ----- decode and handle FileRegion data stream
+                            p.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter)); // chunkedFile default is 8192, but delimiter ctontains 3 chars
+//                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter)); // chunkedFile default is 8192, but delimiter ctontains 3 chars
                             p.addLast(new FileClientHandler()); // stream decode by delimite
                         }
                     });
