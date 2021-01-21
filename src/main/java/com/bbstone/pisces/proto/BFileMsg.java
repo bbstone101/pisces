@@ -19,16 +19,16 @@ public final class BFileMsg {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string magic = 1;</code>
-     * @return The magic.
+     * <code>string id = 1;</code>
+     * @return The id.
      */
-    java.lang.String getMagic();
+    java.lang.String getId();
     /**
-     * <code>string magic = 1;</code>
-     * @return The bytes for magic.
+     * <code>string id = 1;</code>
+     * @return The bytes for id.
      */
     com.google.protobuf.ByteString
-        getMagicBytes();
+        getIdBytes();
 
     /**
      * <code>string cmd = 2;</code>
@@ -73,7 +73,7 @@ public final class BFileMsg {
       super(builder);
     }
     private BFileReq() {
-      magic_ = "";
+      id_ = "";
       cmd_ = "";
       filepath_ = "";
     }
@@ -111,7 +111,7 @@ public final class BFileMsg {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              magic_ = s;
+              id_ = s;
               break;
             }
             case 18: {
@@ -163,38 +163,38 @@ public final class BFileMsg {
               com.bbstone.pisces.proto.BFileMsg.BFileReq.class, com.bbstone.pisces.proto.BFileMsg.BFileReq.Builder.class);
     }
 
-    public static final int MAGIC_FIELD_NUMBER = 1;
-    private volatile java.lang.Object magic_;
+    public static final int ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object id_;
     /**
-     * <code>string magic = 1;</code>
-     * @return The magic.
+     * <code>string id = 1;</code>
+     * @return The id.
      */
     @java.lang.Override
-    public java.lang.String getMagic() {
-      java.lang.Object ref = magic_;
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        magic_ = s;
+        id_ = s;
         return s;
       }
     }
     /**
-     * <code>string magic = 1;</code>
-     * @return The bytes for magic.
+     * <code>string id = 1;</code>
+     * @return The bytes for id.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getMagicBytes() {
-      java.lang.Object ref = magic_;
+        getIdBytes() {
+      java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        magic_ = b;
+        id_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -302,8 +302,8 @@ public final class BFileMsg {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getMagicBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, magic_);
+      if (!getIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
       }
       if (!getCmdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, cmd_);
@@ -323,8 +323,8 @@ public final class BFileMsg {
       if (size != -1) return size;
 
       size = 0;
-      if (!getMagicBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, magic_);
+      if (!getIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
       }
       if (!getCmdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, cmd_);
@@ -351,8 +351,8 @@ public final class BFileMsg {
       }
       com.bbstone.pisces.proto.BFileMsg.BFileReq other = (com.bbstone.pisces.proto.BFileMsg.BFileReq) obj;
 
-      if (!getMagic()
-          .equals(other.getMagic())) return false;
+      if (!getId()
+          .equals(other.getId())) return false;
       if (!getCmd()
           .equals(other.getCmd())) return false;
       if (!getFilepath()
@@ -370,8 +370,8 @@ public final class BFileMsg {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + MAGIC_FIELD_NUMBER;
-      hash = (53 * hash) + getMagic().hashCode();
+      hash = (37 * hash) + ID_FIELD_NUMBER;
+      hash = (53 * hash) + getId().hashCode();
       hash = (37 * hash) + CMD_FIELD_NUMBER;
       hash = (53 * hash) + getCmd().hashCode();
       hash = (37 * hash) + FILEPATH_FIELD_NUMBER;
@@ -512,7 +512,7 @@ public final class BFileMsg {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        magic_ = "";
+        id_ = "";
 
         cmd_ = "";
 
@@ -546,7 +546,7 @@ public final class BFileMsg {
       @java.lang.Override
       public com.bbstone.pisces.proto.BFileMsg.BFileReq buildPartial() {
         com.bbstone.pisces.proto.BFileMsg.BFileReq result = new com.bbstone.pisces.proto.BFileMsg.BFileReq(this);
-        result.magic_ = magic_;
+        result.id_ = id_;
         result.cmd_ = cmd_;
         result.filepath_ = filepath_;
         result.ts_ = ts_;
@@ -598,8 +598,8 @@ public final class BFileMsg {
 
       public Builder mergeFrom(com.bbstone.pisces.proto.BFileMsg.BFileReq other) {
         if (other == com.bbstone.pisces.proto.BFileMsg.BFileReq.getDefaultInstance()) return this;
-        if (!other.getMagic().isEmpty()) {
-          magic_ = other.magic_;
+        if (!other.getId().isEmpty()) {
+          id_ = other.id_;
           onChanged();
         }
         if (!other.getCmd().isEmpty()) {
@@ -642,78 +642,78 @@ public final class BFileMsg {
         return this;
       }
 
-      private java.lang.Object magic_ = "";
+      private java.lang.Object id_ = "";
       /**
-       * <code>string magic = 1;</code>
-       * @return The magic.
+       * <code>string id = 1;</code>
+       * @return The id.
        */
-      public java.lang.String getMagic() {
-        java.lang.Object ref = magic_;
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          magic_ = s;
+          id_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string magic = 1;</code>
-       * @return The bytes for magic.
+       * <code>string id = 1;</code>
+       * @return The bytes for id.
        */
       public com.google.protobuf.ByteString
-          getMagicBytes() {
-        java.lang.Object ref = magic_;
+          getIdBytes() {
+        java.lang.Object ref = id_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          magic_ = b;
+          id_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string magic = 1;</code>
-       * @param value The magic to set.
+       * <code>string id = 1;</code>
+       * @param value The id to set.
        * @return This builder for chaining.
        */
-      public Builder setMagic(
+      public Builder setId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        magic_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string magic = 1;</code>
+       * <code>string id = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMagic() {
+      public Builder clearId() {
         
-        magic_ = getDefaultInstance().getMagic();
+        id_ = getDefaultInstance().getId();
         onChanged();
         return this;
       }
       /**
-       * <code>string magic = 1;</code>
-       * @param value The bytes for magic to set.
+       * <code>string id = 1;</code>
+       * @param value The bytes for id to set.
        * @return This builder for chaining.
        */
-      public Builder setMagicBytes(
+      public Builder setIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        magic_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
@@ -958,16 +958,16 @@ public final class BFileMsg {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string magic = 1;</code>
-     * @return The magic.
+     * <code>string id = 1;</code>
+     * @return The id.
      */
-    java.lang.String getMagic();
+    java.lang.String getId();
     /**
-     * <code>string magic = 1;</code>
-     * @return The bytes for magic.
+     * <code>string id = 1;</code>
+     * @return The bytes for id.
      */
     com.google.protobuf.ByteString
-        getMagicBytes();
+        getIdBytes();
 
     /**
      * <code>string cmd = 2;</code>
@@ -1054,7 +1054,7 @@ public final class BFileMsg {
       super(builder);
     }
     private BFileRsp() {
-      magic_ = "";
+      id_ = "";
       cmd_ = "";
       filepath_ = "";
       checksum_ = "";
@@ -1095,7 +1095,7 @@ public final class BFileMsg {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              magic_ = s;
+              id_ = s;
               break;
             }
             case 18: {
@@ -1174,38 +1174,38 @@ public final class BFileMsg {
               com.bbstone.pisces.proto.BFileMsg.BFileRsp.class, com.bbstone.pisces.proto.BFileMsg.BFileRsp.Builder.class);
     }
 
-    public static final int MAGIC_FIELD_NUMBER = 1;
-    private volatile java.lang.Object magic_;
+    public static final int ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object id_;
     /**
-     * <code>string magic = 1;</code>
-     * @return The magic.
+     * <code>string id = 1;</code>
+     * @return The id.
      */
     @java.lang.Override
-    public java.lang.String getMagic() {
-      java.lang.Object ref = magic_;
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        magic_ = s;
+        id_ = s;
         return s;
       }
     }
     /**
-     * <code>string magic = 1;</code>
-     * @return The bytes for magic.
+     * <code>string id = 1;</code>
+     * @return The bytes for id.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getMagicBytes() {
-      java.lang.Object ref = magic_;
+        getIdBytes() {
+      java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        magic_ = b;
+        id_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1422,8 +1422,8 @@ public final class BFileMsg {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getMagicBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, magic_);
+      if (!getIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
       }
       if (!getCmdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, cmd_);
@@ -1458,8 +1458,8 @@ public final class BFileMsg {
       if (size != -1) return size;
 
       size = 0;
-      if (!getMagicBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, magic_);
+      if (!getIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
       }
       if (!getCmdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, cmd_);
@@ -1504,8 +1504,8 @@ public final class BFileMsg {
       }
       com.bbstone.pisces.proto.BFileMsg.BFileRsp other = (com.bbstone.pisces.proto.BFileMsg.BFileRsp) obj;
 
-      if (!getMagic()
-          .equals(other.getMagic())) return false;
+      if (!getId()
+          .equals(other.getId())) return false;
       if (!getCmd()
           .equals(other.getCmd())) return false;
       if (!getFilepath()
@@ -1533,8 +1533,8 @@ public final class BFileMsg {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + MAGIC_FIELD_NUMBER;
-      hash = (53 * hash) + getMagic().hashCode();
+      hash = (37 * hash) + ID_FIELD_NUMBER;
+      hash = (53 * hash) + getId().hashCode();
       hash = (37 * hash) + CMD_FIELD_NUMBER;
       hash = (53 * hash) + getCmd().hashCode();
       hash = (37 * hash) + FILEPATH_FIELD_NUMBER;
@@ -1687,7 +1687,7 @@ public final class BFileMsg {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        magic_ = "";
+        id_ = "";
 
         cmd_ = "";
 
@@ -1731,7 +1731,7 @@ public final class BFileMsg {
       @java.lang.Override
       public com.bbstone.pisces.proto.BFileMsg.BFileRsp buildPartial() {
         com.bbstone.pisces.proto.BFileMsg.BFileRsp result = new com.bbstone.pisces.proto.BFileMsg.BFileRsp(this);
-        result.magic_ = magic_;
+        result.id_ = id_;
         result.cmd_ = cmd_;
         result.filepath_ = filepath_;
         result.fileSize_ = fileSize_;
@@ -1788,8 +1788,8 @@ public final class BFileMsg {
 
       public Builder mergeFrom(com.bbstone.pisces.proto.BFileMsg.BFileRsp other) {
         if (other == com.bbstone.pisces.proto.BFileMsg.BFileRsp.getDefaultInstance()) return this;
-        if (!other.getMagic().isEmpty()) {
-          magic_ = other.magic_;
+        if (!other.getId().isEmpty()) {
+          id_ = other.id_;
           onChanged();
         }
         if (!other.getCmd().isEmpty()) {
@@ -1849,78 +1849,78 @@ public final class BFileMsg {
         return this;
       }
 
-      private java.lang.Object magic_ = "";
+      private java.lang.Object id_ = "";
       /**
-       * <code>string magic = 1;</code>
-       * @return The magic.
+       * <code>string id = 1;</code>
+       * @return The id.
        */
-      public java.lang.String getMagic() {
-        java.lang.Object ref = magic_;
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          magic_ = s;
+          id_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string magic = 1;</code>
-       * @return The bytes for magic.
+       * <code>string id = 1;</code>
+       * @return The bytes for id.
        */
       public com.google.protobuf.ByteString
-          getMagicBytes() {
-        java.lang.Object ref = magic_;
+          getIdBytes() {
+        java.lang.Object ref = id_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          magic_ = b;
+          id_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string magic = 1;</code>
-       * @param value The magic to set.
+       * <code>string id = 1;</code>
+       * @param value The id to set.
        * @return This builder for chaining.
        */
-      public Builder setMagic(
+      public Builder setId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        magic_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string magic = 1;</code>
+       * <code>string id = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMagic() {
+      public Builder clearId() {
         
-        magic_ = getDefaultInstance().getMagic();
+        id_ = getDefaultInstance().getId();
         onChanged();
         return this;
       }
       /**
-       * <code>string magic = 1;</code>
-       * @param value The bytes for magic to set.
+       * <code>string id = 1;</code>
+       * @param value The bytes for id to set.
        * @return This builder for chaining.
        */
-      public Builder setMagicBytes(
+      public Builder setIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        magic_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
@@ -2428,14 +2428,13 @@ public final class BFileMsg {
   static {
     java.lang.String[] descriptorData = {
       "\n\016BFileMsg.proto\022\030com.bbstone.pisces.pro" +
-      "to\"D\n\010BFileReq\022\r\n\005magic\030\001 \001(\t\022\013\n\003cmd\030\002 \001" +
-      "(\t\022\020\n\010filepath\030\003 \001(\t\022\n\n\002ts\030\004 \001(\004\"\236\001\n\010BFi" +
-      "leRsp\022\r\n\005magic\030\001 \001(\t\022\013\n\003cmd\030\002 \001(\t\022\020\n\010fil" +
-      "epath\030\003 \001(\t\022\020\n\010fileSize\030\004 \001(\004\022\020\n\010checksu" +
-      "m\030\005 \001(\t\022\017\n\007rspData\030\006 \001(\t\022\021\n\tchunkData\030\007 " +
-      "\001(\014\022\r\n\005reqTs\030\010 \001(\004\022\r\n\005rspTs\030\t \001(\004B&\n\030com" +
-      ".bbstone.pisces.protoB\010BFileMsgH\001b\006proto" +
-      "3"
+      "to\"A\n\010BFileReq\022\n\n\002id\030\001 \001(\t\022\013\n\003cmd\030\002 \001(\t\022" +
+      "\020\n\010filepath\030\003 \001(\t\022\n\n\002ts\030\004 \001(\004\"\233\001\n\010BFileR" +
+      "sp\022\n\n\002id\030\001 \001(\t\022\013\n\003cmd\030\002 \001(\t\022\020\n\010filepath\030" +
+      "\003 \001(\t\022\020\n\010fileSize\030\004 \001(\004\022\020\n\010checksum\030\005 \001(" +
+      "\t\022\017\n\007rspData\030\006 \001(\t\022\021\n\tchunkData\030\007 \001(\014\022\r\n" +
+      "\005reqTs\030\010 \001(\004\022\r\n\005rspTs\030\t \001(\004B&\n\030com.bbsto" +
+      "ne.pisces.protoB\010BFileMsgH\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2446,13 +2445,13 @@ public final class BFileMsg {
     internal_static_com_bbstone_pisces_proto_BFileReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_bbstone_pisces_proto_BFileReq_descriptor,
-        new java.lang.String[] { "Magic", "Cmd", "Filepath", "Ts", });
+        new java.lang.String[] { "Id", "Cmd", "Filepath", "Ts", });
     internal_static_com_bbstone_pisces_proto_BFileRsp_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_com_bbstone_pisces_proto_BFileRsp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_bbstone_pisces_proto_BFileRsp_descriptor,
-        new java.lang.String[] { "Magic", "Cmd", "Filepath", "FileSize", "Checksum", "RspData", "ChunkData", "ReqTs", "RspTs", });
+        new java.lang.String[] { "Id", "Cmd", "Filepath", "FileSize", "Checksum", "RspData", "ChunkData", "ReqTs", "RspTs", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

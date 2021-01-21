@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ProtoClientHandler extends SimpleChannelInboundHandler<BFileMsg.BFileRsp> {
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, BFileMsg.BFileRsp msg) throws Exception {
-        log.info("magic from server: {}", msg.getMagic());
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, BFileMsg.BFileRsp rsp) throws Exception {
+        log.info("magic from server: {}", rsp.getId());
 
 
     }

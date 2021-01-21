@@ -72,7 +72,7 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        log.info("client recv readableBytes: {}", msg.readableBytes());
+        log.info("client recv total readableBytes: {}", msg.readableBytes());
         RspDispatcher.dispatch(ctx, msg);
     }
 }

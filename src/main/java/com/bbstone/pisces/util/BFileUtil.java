@@ -253,12 +253,12 @@ public class BFileUtil {
 
     /**
      *
-     * @param clipath - client full path
+     * @param clientFullPath - client full path
      * @return
      */
-    public static String getCliTempFilepath(String clipath) {
-        if (isDir(clipath)) return clipath;
-        return clipath + Config.tempFilePostfix;
+    public static String getClientTempFileFullPath(String clientFullPath) {
+        if (isDir(clientFullPath)) return clientFullPath;
+        return clientFullPath + Config.tempFilePostfix;
     }
 
     /**
@@ -268,7 +268,7 @@ public class BFileUtil {
      */
     public static String getPartFileFromRelative(String serverRelativeFile) {
         String clientFullPath = BFileUtil.getCliFilepath(serverRelativeFile);
-        String tempFile = BFileUtil.getCliTempFilepath(clientFullPath);
+        String tempFile = BFileUtil.getClientTempFileFullPath(clientFullPath);
         return tempFile;
     }
 
@@ -280,7 +280,7 @@ public class BFileUtil {
     public static String getPartFileFromFull(String serverFileFullPath) {
         String serverRelativeFile = getServerRelativePath(serverFileFullPath);
         String clientFullPath = BFileUtil.getCliFilepath(serverRelativeFile);
-        String tempFile = BFileUtil.getCliTempFilepath(clientFullPath);
+        String tempFile = BFileUtil.getClientTempFileFullPath(clientFullPath);
         return tempFile;
     }
 
@@ -368,10 +368,11 @@ public class BFileUtil {
         // BFile info prefix
         byte[] prefix = BByteUtil.toBytes(ConstUtil.bfile_info_prefix);
         // BFile info
+        String filepath = getServerRelativePath(serverpath);
         BFileMsg.BFileRsp rsp = BFileMsg.BFileRsp.newBuilder()
-                .setMagic(ConstUtil.magic)
+                .setId(MD5.asHex(BByteUtil.toBytes(filepath)))
                 .setCmd(cmd) //BFileCmd.CMD_RSP)
-                .setFilepath(getServerRelativePath(serverpath))
+                .setFilepath(filepath) // relative path(not contains client.dir or server.dir)
                 .setFileSize(filesize)
                 .setChecksum(checksum)
                 .setRspData(StringUtils.trimToEmpty(rspData))
@@ -416,7 +417,7 @@ public class BFileUtil {
      */
     public static BFileMsg.BFileReq buildReq(String cmd, String filepath) {
         BFileMsg.BFileReq req = BFileMsg.BFileReq.newBuilder()
-                .setMagic(ConstUtil.magic)
+                .setId(MD5.asHex(BByteUtil.toBytes(filepath)))
                 .setCmd(cmd)
                 .setFilepath(filepath)
                 .setTs(System.currentTimeMillis())

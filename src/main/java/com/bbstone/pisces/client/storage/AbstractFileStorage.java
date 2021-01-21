@@ -36,7 +36,7 @@ public abstract class AbstractFileStorage {
 
         String filepath = rsp.getFilepath();
         clipath = BFileUtil.getCliFilepath(filepath);
-        temppath = BFileUtil.getCliTempFilepath(clipath);
+        temppath = BFileUtil.getClientTempFileFullPath(clipath);
         log.info("filepath: {}, clipath: {}, temppath: {}", filepath, clipath, temppath);
         tempfile = new File(temppath);
     }

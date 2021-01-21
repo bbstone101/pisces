@@ -7,7 +7,7 @@ option java_package = "com.bbstone.pisces.proto";
 option java_outer_classname="BFileMsg";
 
 message BFileReq{
-    string magic = 1;
+    string id = 1;
     string cmd = 2;
     string filepath = 3;
     
@@ -15,7 +15,7 @@ message BFileReq{
 }
 
 message BFileRsp{
-    string magic = 1;
+    string id = 1;
     string cmd = 2;
     string filepath = 3;
 
