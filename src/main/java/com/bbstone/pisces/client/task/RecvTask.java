@@ -87,7 +87,7 @@ public class RecvTask implements ITask {
         recvSize += len;
 
 
-        log.info("recv file data len: {}, now progress: {}/{}(<==>{})", len, recvSize, fileSize, Math.floor(recvSize*0.1f/fileSize*0.1f));
+        log.info("recv file data len: {}, now progress: {}/{}({}%)", len, recvSize, fileSize, Math.floor((recvSize*1d/fileSize*1d) * 10000)/100 );
         boolean saveOK = false;
         // sbuf full or all file data received
         if (spos >= SBUF_SIZE || recvSize == fileSize) {
