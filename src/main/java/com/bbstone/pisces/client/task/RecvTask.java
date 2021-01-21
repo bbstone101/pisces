@@ -58,11 +58,11 @@ public class RecvTask implements ITask {
             this.fileSize = rsp.getFileSize();
             this.checksum = rsp.getChecksum();
 
-            this.clientFullPath = BFileUtil.getClientFullPath(rsp.getFilepath());
-            checkFileExists(this.clientFullPath);
+            this.clientFullPath = BFileUtil.getClientFullPathWithCheck(rsp.getFilepath());
+//            checkFileExists(this.clientFullPath);
 
             this.tempFullPath = BFileUtil.getClientTempFileFullPath(clientFullPath);
-            checkFileExists(this.tempFullPath);
+//            checkFileExists(this.tempFullPath);
 
 //            this.tempfile = new File(this.tempFullPath);
 

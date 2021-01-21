@@ -2,6 +2,7 @@ package com.bbstone.pisces.client.cmd;
 
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
+import com.bbstone.pisces.util.CtxUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +13,15 @@ public class DirRspHandler implements CmdHandler {
     public void handle(ChannelHandlerContext ctx, BFileMsg.BFileRsp rsp, ByteBuf msg) {
         // server filepath
         String serverdir = rsp.getFilepath();
-        String clientdir = BFileUtil.getCliFilepath(serverdir, Boolean.FALSE);
+        String clientdir = BFileUtil.getClientFullPathWithCheck(serverdir, Boolean.FALSE);
         log.info("recv server dir: {}, client dir: {}", serverdir, clientdir);
         BFileUtil.mkdir(clientdir);
         log.info("client create dir: {}", clientdir);
+        String nextFile = CtxUtil.reqNextFile(ctx);
+        log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
+        if (nextFile == null) {
+            log.info("all files received, try to stop client.");
+            System.exit(0);
+        }
     }
 }

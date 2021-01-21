@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 
 @Slf4j
 public class BFileUtil {
@@ -57,9 +58,6 @@ public class BFileUtil {
     }
 
 
-
-
-
     public static String list(String filepath) {
         if (Files.notExists(Paths.get(filepath))) {
             log.warn("not found file/directory: {}", filepath);
@@ -93,6 +91,7 @@ public class BFileUtil {
 
     /**
      * return all sub-files relatived to server.dir
+     *
      * @param filepath
      * @return
      */
@@ -141,21 +140,37 @@ public class BFileUtil {
     }
 
     /**
-     *
      * @param relativePath - server relative path(base on: server.dir)
-     * @param check - check path or not
+     * @param check        - check path or not
      * @return
      */
-    public static String getCliFilepath(String relativePath, boolean check) {
+    public static String getClientFullPathWithCheck(String relativePath, boolean check) {
 //        String relativePath = getCanonicalPath(filepath).substring(getServerDir().length());
-        String clipath =  getClientDir() + relativePath;
+        String clipath = getClientDir() + getCanonicalRelativePath(relativePath);
+        String clientpath = convertToLocalePath(clipath);
         if (check)
-            checkPath(clipath);
-        return clipath;
+            checkPath(clientpath);
+        return clientpath;
     }
 
     /**
+     * convert path which a server os path to client os path
+     * e.g. server is *nix, client is windows,
+     * need to convert server path format to client os platform format
      *
+     * @param path
+     * @return
+     */
+    private static String convertToLocalePath(String path) {
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().startsWith("win")) {
+            return path.replaceAll(ConstUtil.NIX_FILE_SEPARATOR, Matcher.quoteReplacement(File.separator));
+        } else {
+            return path.replaceAll(ConstUtil.WIN_FILE_SEPARATOR, File.separator);
+        }
+    }
+
+    /**
      * @param serverFullPath
      * @return
      */
@@ -166,13 +181,13 @@ public class BFileUtil {
         return getCanonicalRelativePath(serverFullPath.substring(getServerDir().length()));
     }
 
-    public static String getClientFullPath(String serverRelativePath) {
-        return getClientDir() + getCanonicalRelativePath(serverRelativePath);
-    }
+//    public static String getClientFullPath(String serverRelativePath) {
+//        return getClientDir() + getCanonicalRelativePath(serverRelativePath);
+//    }
 
     public static String getClientDir() {
         String clientdir = Config.clientDir;
-        if ( StringUtils.isBlank(clientdir) ) {
+        if (StringUtils.isBlank(clientdir)) {
             throw new RuntimeException("client.dir property cannot be empty.");
         }
         return getCanonicalPath(clientdir);
@@ -180,7 +195,7 @@ public class BFileUtil {
 
     public static String getServerDir() {
         String serverdir = Config.serverDir;
-        if ( StringUtils.isBlank(serverdir) ) {
+        if (StringUtils.isBlank(serverdir)) {
             throw new RuntimeException("server.dir property cannot be empty.");
         }
         return getCanonicalPath(serverdir);
@@ -195,17 +210,19 @@ public class BFileUtil {
     private static String getCanonicalPath(String path) {
         // append last File.separator for dir
         if (Files.isDirectory(Paths.get(path))) {
-            path = ( path.lastIndexOf(File.separator) == (path.length() - 1) ) ? path : path + File.separator;
+            path = (path.lastIndexOf(File.separator) == (path.length() - 1)) ? path : path + File.separator;
         }
         return path;
     }
 
     /**
      * remove the first File.separator
+     *
      * @param path
      * @return
      */
     private static String getCanonicalRelativePath(String path) {
+        path = convertToLocalePath(path);
         // remove the first File.separator
         if (path.startsWith(File.separator)) {
             path = path.substring(File.separator.length());
@@ -214,12 +231,11 @@ public class BFileUtil {
     }
 
     /**
-     *
      * @param relativePath
      * @return
      */
-    public static String getCliFilepath(String relativePath) {
-        return getCliFilepath(relativePath, Boolean.TRUE);
+    public static String getClientFullPathWithCheck(String relativePath) {
+        return getClientFullPathWithCheck(relativePath, Boolean.TRUE);
     }
 
     private static void checkPath(String clipath) {
@@ -238,6 +254,7 @@ public class BFileUtil {
 
     /**
      * create directory
+     *
      * @param dirpath -  a directory path
      */
     public static void mkdir(String dirpath) {
@@ -252,7 +269,6 @@ public class BFileUtil {
     }
 
     /**
-     *
      * @param clientFullPath - client full path
      * @return
      */
@@ -262,24 +278,22 @@ public class BFileUtil {
     }
 
     /**
-     *
      * @param serverRelativeFile
      * @return
      */
     public static String getPartFileFromRelative(String serverRelativeFile) {
-        String clientFullPath = BFileUtil.getCliFilepath(serverRelativeFile);
+        String clientFullPath = BFileUtil.getClientFullPathWithCheck(serverRelativeFile);
         String tempFile = BFileUtil.getClientTempFileFullPath(clientFullPath);
         return tempFile;
     }
 
     /**
-     *
      * @param serverFileFullPath
      * @return
      */
     public static String getPartFileFromFull(String serverFileFullPath) {
         String serverRelativeFile = getServerRelativePath(serverFileFullPath);
-        String clientFullPath = BFileUtil.getCliFilepath(serverRelativeFile);
+        String clientFullPath = BFileUtil.getClientFullPathWithCheck(serverRelativeFile);
         String tempFile = BFileUtil.getClientTempFileFullPath(clientFullPath);
         return tempFile;
     }
@@ -291,6 +305,7 @@ public class BFileUtil {
 
     /**
      * rename temp file to client file
+     *
      * @param tmpFile
      * @param clipath
      */
@@ -317,6 +332,7 @@ public class BFileUtil {
 
     /**
      * build ListRsp
+     *
      * @param serverpath
      * @param rspData
      * @param reqTs
@@ -330,20 +346,19 @@ public class BFileUtil {
 
 
     /**
-     *
      * BFileRsp intro:
      * it contains 2 field for store server response data(rspData/chunkData),
      * usage:
-     *  rspData - string, can be json string or only some string words
-     *  fileChunkData - byte[], byte array data
-     *
-     *
+     * rspData - string, can be json string or only some string words
+     * fileChunkData - byte[], byte array data
+     * <p>
+     * <p>
      * Standard Rsp format like:
      * +--------------------------------------------------------------------+
      * | bfile_info_prefix | bfile_info_bytes(int) | bfile_info | delimiter |
      * +--------------------------------------------------------------------+
      * <p>
-     *
+     * <p>
      * Non-standard format(append byte[] data after Rsp object, because cannot retrieve the data and set to Rsp.chunkData:
      * e.g. FileRsp(cmd: CMD_REQ) data format(only for FileRegion which directly write file data to channel):
      * +---------------------------------------------------------------------------------+
@@ -351,9 +366,9 @@ public class BFileUtil {
      * +---------------------------------------------------------------------------------+
      * <p>
      * bfile_info_prefix:
-     *
+     * <p>
      * Note: delimiter not encode in upper format, need append delimiter after
-     *      this method invoked, see "bytes size format" in method body
+     * this method invoked, see "bytes size format" in method body
      *
      * @param cmd
      * @param serverpath
@@ -410,7 +425,6 @@ public class BFileUtil {
 
 
     /**
-     *
      * @param cmd
      * @param filepath
      * @return
@@ -425,8 +439,6 @@ public class BFileUtil {
 
         return req;
     }
-
-
 
 
     public static void main(String[] args) {
@@ -490,11 +502,16 @@ public class BFileUtil {
 //        log.info("xbyte.len: {}, ba.len: {}", xbytes.length, ba.length);
 //        System.out.println(BByteUtil.toStr(ba));
 
-        System.out.println(12%8);
+        System.out.println(12 % 8);
+
+        System.out.println(System.getProperty("os.name"));
+
+//        String path = "D:\\aa\\bb\\c.txt";
+        String path = "D:/aa/bb/c.txt";
+        System.out.println(convertToLocalePath(path));
+
+
     }
-
-
-
 
 
 }

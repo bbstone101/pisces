@@ -108,7 +108,7 @@ public class FileReqHandler implements CmdHandler {
         log.info("filelen: {}, write BFileRsp to client......", filelen);
 
         // ------------ send file chunk by chunk
-        int pos = 0;
+        long pos = 0;
         int chunkCounter = 0;
         long chunkSize = 0;
         while ((filelen - pos) > 0) {

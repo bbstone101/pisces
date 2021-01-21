@@ -22,6 +22,9 @@ public class ConstUtil {
     public static final int DEFAULT_CHUNK_SIZE = 1024 * 8; // 8k
 
 
+    /** regex in String.replaceAll() method */
+    public static final String WIN_FILE_SEPARATOR = "\\\\";
+    public static final String NIX_FILE_SEPARATOR = "\\/";
 
 
 
