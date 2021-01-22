@@ -23,7 +23,7 @@ public class ListRspHandler implements CmdHandler {
 //            String filepath = rsp.getFilepath();
 //            String checksum = rsp.getChecksum();
             String rspData = rsp.getRspData();
-            log.info("client recv fileTree: \n / \n{}", rspData);
+            log.debug("client recv fileTree: \n / \n{}", rspData);
 
         List<String> fileList = JSON.parseArray(rspData, String.class);
         ClientCache.init(fileList);

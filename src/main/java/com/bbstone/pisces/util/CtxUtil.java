@@ -16,8 +16,8 @@ public class CtxUtil {
         String nextFile = ClientCache.nextFile();
         if (StringUtils.isNotBlank(nextFile)) {
 //            String serverRelativeFile = BFileUtil.getServerRelativePath(nextFile);
-//            log.info("after list files, req to download nextFile: {}, serverRelativeFile: {}", nextFile, serverRelativeFile);
-            log.info("after list files, req to download nextFile: {}", nextFile);
+//            log.debug("after list files, req to download nextFile: {}, serverRelativeFile: {}", nextFile, serverRelativeFile);
+            log.debug("after list files, req to download nextFile: {}", nextFile);
             // FileReq
             BFileMsg.BFileReq req = BFileUtil.buildReq(BFileCmd.REQ_FILE, nextFile);
             ctx.write(req);

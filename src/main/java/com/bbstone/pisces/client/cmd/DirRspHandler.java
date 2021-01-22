@@ -14,13 +14,13 @@ public class DirRspHandler implements CmdHandler {
         // server filepath
         String serverdir = rsp.getFilepath();
         String clientdir = BFileUtil.getClientFullPathWithCheck(serverdir, Boolean.FALSE);
-        log.info("recv server dir: {}, client dir: {}", serverdir, clientdir);
+        log.debug("recv server dir: {}, client dir: {}", serverdir, clientdir);
         BFileUtil.mkdir(clientdir);
-        log.info("client create dir: {}", clientdir);
+        log.debug("client create dir: {}", clientdir);
         String nextFile = CtxUtil.reqNextFile(ctx);
-        log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
+        log.debug("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
         if (nextFile == null) {
-            log.info("all files received, try to stop client.");
+            log.debug("all files received, try to stop client.");
             System.exit(0);
         }
     }

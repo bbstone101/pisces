@@ -28,7 +28,7 @@ public class FileRspHandler implements CmdHandler {
 
     @Override
     public void handle(ChannelHandlerContext ctx, BFileMsg.BFileRsp rsp, ByteBuf msg) {
-        log.info("handling file(id: {})...", rsp.getId());
+        log.debug("handling file(id: {})...", rsp.getId());
         byte[] fileData = parseFileData(msg);
         RecvTask recvTask = null;
         if ((recvTask = ClientCache.getTask(rsp.getId())) == null) {
@@ -39,9 +39,9 @@ public class FileRspHandler implements CmdHandler {
         if (status == TaskStatus.COMPLETED) {
             // request next file
             String nextFile = CtxUtil.reqNextFile(ctx);
-            log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
+            log.debug("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
             if (nextFile == null) {
-                log.info("all files received, try to stop client.");
+                log.debug("all files received, try to stop client.");
                 System.exit(0);
             }
         }
@@ -79,7 +79,7 @@ public class FileRspHandler implements CmdHandler {
 //        String filepath = rsp.getFilepath();
 //        clipath = BFileUtil.getCliFilepath(filepath);
 //        temppath = BFileUtil.getClientTempFileFullPath(clipath);
-//        log.info("filepath: {}, clipath: {}, temppath: {}", filepath, clipath, temppath);
+//        log.debug("filepath: {}, clipath: {}, temppath: {}", filepath, clipath, temppath);
 //        tempfile = new File(temppath);
 //
 //        if (fos == null) {
@@ -87,16 +87,16 @@ public class FileRspHandler implements CmdHandler {
 //        }
 ////            FileOutputStream fos = new FileOutputStream(tempfile, true);
 //        fos.write(chunkData);
-//        log.info("wrote current chunk to disk done.");
+//        log.debug("wrote current chunk to disk done.");
 //
 //        chunkCounter++;
 //        recvSize += chunkLen;
-//        log.info("recv the {} chunk, chunkLen: {}, progress: {}/{}", chunkCounter, chunkLen, recvSize, rsp.getFileSize());
-//        log.info("============ chunk recv done==========");
+//        log.debug("recv the {} chunk, chunkLen: {}, progress: {}/{}", chunkCounter, chunkLen, recvSize, rsp.getFileSize());
+//        log.debug("============ chunk recv done==========");
 //
 //        // all file data received
 //        if (recvSize > 0 && rsp.getFileSize() == recvSize) {
-//            log.info("all bytes received, try to close fos.");
+//            log.debug("all bytes received, try to close fos.");
 //            recvSize = 0; // reset counter
 //            chunkCounter = 0;
 //            if (fos != null)
@@ -105,22 +105,22 @@ public class FileRspHandler implements CmdHandler {
 //
 //            // check file integrity
 //            String checkSum = BFileUtil.checksum(new File(temppath));
-//            log.info("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
+//            log.debug("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
 //
 //            if (rsp.getChecksum().equals(checkSum)) {
 //                BFileUtil.renameCliTempFile(tempfile, clipath);
 //            }
 //            long endTime = System.currentTimeMillis();
-//            log.info("============ endTime: {}==========", endTime);
+//            log.debug("============ endTime: {}==========", endTime);
 //
 //            long costTime = (endTime - rsp.getReqTs()) / 1000;
-//            log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
+//            log.debug(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
 //
 //            // request next file
 //            String nextFile = CtxUtil.reqNextFile(ctx);
-//            log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
+//            log.debug("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
 //            if (nextFile == null) {
-//                log.info("all files received, try to stop client.");
+//                log.debug("all files received, try to stop client.");
 //                System.exit(0);
 //            }
 ////                String nextServerFullPath = CtxUtil.reqNextFile(ctx);

@@ -37,7 +37,7 @@ public abstract class AbstractFileStorage {
         String filepath = rsp.getFilepath();
         clipath = BFileUtil.getClientFullPathWithCheck(filepath);
         temppath = BFileUtil.getClientTempFileFullPath(clipath);
-        log.info("filepath: {}, clipath: {}, temppath: {}", filepath, clipath, temppath);
+        log.debug("filepath: {}, clipath: {}, temppath: {}", filepath, clipath, temppath);
         tempfile = new File(temppath);
     }
 
@@ -67,10 +67,10 @@ public abstract class AbstractFileStorage {
                 fos = new FileOutputStream(tempfile, true);
             }
             fos.write(data);
-            log.info("wrote data to disk ...");
+            log.debug("wrote data to disk ...");
             if (recvSize == fileSize) {
                 fos.close();
-                log.info("all file data saved.");
+                log.debug("all file data saved.");
             }
         } catch (IOException e) {
             e.printStackTrace();

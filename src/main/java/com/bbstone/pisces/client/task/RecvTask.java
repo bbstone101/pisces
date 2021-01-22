@@ -28,7 +28,9 @@ public class RecvTask implements ITask {
 
 
     // 8k * 8 = 64k
-    private final int SBUF_SIZE = 8192 * 8;
+//    private final int SBUF_SIZE = 8192 * 8;
+    // 4M
+    private final int SBUF_SIZE = 4 * 1024 * 1024;
     // accumulate SBUF_SIZE before save file data
     private byte[] sbuf = new byte[SBUF_SIZE];
     // sbuf next write position
@@ -110,23 +112,23 @@ public class RecvTask implements ITask {
             closeFos();
             // check file integrity
             String checkSum = BFileUtil.checksum(new File(this.tempFullPath));
-            log.info("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
-            log.info("filepath: {}", rsp.getFilepath());
-            log.info("clientFullPath: {}, tempFullPath: {}", clientFullPath, tempFullPath);
+            log.debug("server checksum: {}, client checksum: {}, isEq: {}", rsp.getChecksum(), checkSum, (rsp.getChecksum().equals(checkSum)));
+            log.debug("filepath: {}", rsp.getFilepath());
+            log.debug("clientFullPath: {}, tempFullPath: {}", clientFullPath, tempFullPath);
             if (rsp.getChecksum().equals(checkSum)) {
                 BFileUtil.renameCliTempFile(new File(this.tempFullPath), clientFullPath);
-                log.info("temp file rename OK.");
+                log.debug("temp file rename OK.");
             }
             long endTime = System.currentTimeMillis();
-            log.info("============ endTime: {}==========", endTime);
+            log.debug("============ endTime: {}==========", endTime);
 
             long costTime = (endTime - rsp.getReqTs()) / 1000;
-            log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
+            log.debug(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
 
             ClientCache.removeTask(rsp.getId());
             return TaskStatus.COMPLETED;
         }
-        log.info("recvSize: {}, saveSize: {}, fileSize: {}", recvSize, saveSize, fileSize);
+        log.debug("recvSize: {}, saveSize: {}, fileSize: {}", recvSize, saveSize, fileSize);
         // all file data recv, but some save to disk fail
         if (recvSize == fileSize && recvSize == saveSize) {
             closeFos();
@@ -170,7 +172,7 @@ public class RecvTask implements ITask {
                 System.arraycopy(sbuf, 0, wdata, 0, spos);
                 fos.write(wdata);
             }
-            log.info("wrote data to disk ...");
+            log.debug("wrote data to disk ...");
             return true;
         } catch (IOException e) {
             log.error("wrote data to disk error.", e);

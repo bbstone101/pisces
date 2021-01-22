@@ -11,7 +11,7 @@ public class ProtoClientHandler extends SimpleChannelInboundHandler<BFileMsg.BFi
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, BFileMsg.BFileRsp rsp) throws Exception {
-        log.info("magic from server: {}", rsp.getId());
+        log.debug("id from server: {}", rsp.getId());
 
 
     }

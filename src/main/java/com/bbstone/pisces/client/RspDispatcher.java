@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RspDispatcher {
 
     public static void dispatch(ChannelHandlerContext ctx, ByteBuf msg) {
-//        log.info("[in dispatch] -> client recv total msg readableBytes: {}", msg.readableBytes());
+//        log.debug("[in dispatch] -> client recv total msg readableBytes: {}", msg.readableBytes());
 
         BFileMsg.BFileRsp rsp = parseFileInfo(msg);
         String cmd = rsp.getCmd();

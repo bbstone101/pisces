@@ -55,7 +55,7 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 Files.delete(Paths.get(clipath));
             }
             String temppath = BFileUtil.getCliTempFilepath(clipath);
-            log.info("active-> temppath: {}", temppath);
+            log.debug("active-> temppath: {}", temppath);
             if (Files.exists(Paths.get(temppath))) {
                 Files.delete(Paths.get(temppath));
             }
@@ -72,7 +72,7 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        log.info("client recv total readableBytes: {}", msg.readableBytes());
+        log.debug("client recv total readableBytes: {}", msg.readableBytes());
         RspDispatcher.dispatch(ctx, msg);
     }
 }

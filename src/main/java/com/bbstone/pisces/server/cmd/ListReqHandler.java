@@ -16,7 +16,7 @@ import java.util.List;
 public class ListReqHandler implements CmdHandler {
     @Override
     public void handle(ChannelHandlerContext ctx, BFileMsg.BFileReq msg) {
-        log.info("filepath: {}", msg.getFilepath());
+        log.debug("filepath: {}", msg.getFilepath());
         long reqTs = msg.getTs();
         String filepath = msg.getFilepath();
         listDir(ctx, filepath, reqTs);

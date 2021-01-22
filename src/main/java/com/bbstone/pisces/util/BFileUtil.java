@@ -28,7 +28,7 @@ public class BFileUtil {
 
     public static boolean isBFileStream(ByteBuf msg) {
         int len = msg.readableBytes();
-        log.info("msg.len: {}", len);
+        log.debug("msg.len: {}", len);
 
         if (len < ConstUtil.bfile_info_prefix_len)
             return false;
@@ -243,7 +243,7 @@ public class BFileUtil {
         if (Files.notExists(Paths.get(dirpath))) {
             mkdir(dirpath);
         }
-        log.info("checkPath-> dirpath: {}", dirpath);
+        log.debug("checkPath-> dirpath: {}", dirpath);
 //        if (Files.isDirectory(Paths.get(clipath))) {
 //            dirpath = clipath;
 //        } else {
@@ -261,7 +261,7 @@ public class BFileUtil {
         if (Files.notExists(Paths.get(dirpath))) {
             try {
                 Files.createDirectories(Paths.get(dirpath));
-                log.info(">>>>>>>>>>>>>> created dir: {}", dirpath);
+                log.debug(">>>>>>>>>>>>>> created dir: {}", dirpath);
             } catch (IOException e) {
                 log.error("dir create fail. ", e);
             }
@@ -419,7 +419,7 @@ public class BFileUtil {
         cpos += Integer.BYTES;
         System.arraycopy(rspWithoutFileData, 0, data, cpos, rspWithoutFileData.length);
 
-        log.info("data.len: {}, bytes: {}", data.length, data.toString());
+        log.debug("data.len: {}, bytes: {}", data.length, data.toString());
         return Unpooled.wrappedBuffer(data);
     }
 
@@ -445,7 +445,7 @@ public class BFileUtil {
         /*
         String filepath = "/Users/bbstone/Downloads/test";
         String files = list(filepath);
-        log.info(LF + filepath + LF + files);
+        log.debug(LF + filepath + LF + files);
 
 
         String srvpath = "/Users/bbstone/Downloads/test/cuizhu.jpg";
@@ -479,12 +479,12 @@ public class BFileUtil {
 /*
 
         String rpath = getServerRelativePath(filepath);
-        log.info("relative path: {}", rpath);
+        log.debug("relative path: {}", rpath);
 
 //        String filepath = rsp.getFilepath();
         String clipath = BFileUtil.getCliFilepath(rpath);
         String temppath = BFileUtil.getCliTempFilepath(clipath);
-        log.info("filepath: {}, clipath: {}, temppath: {}", rpath, clipath, temppath);
+        log.debug("filepath: {}, clipath: {}, temppath: {}", rpath, clipath, temppath);
 */
 
 //        List<String> fileList = findFiles(getServerDir());
@@ -495,11 +495,11 @@ public class BFileUtil {
         byte[] ba = new byte[1024];
         byte[] sbytes = BByteUtil.toBytes("abc");
         System.arraycopy(sbytes, 0, ba, 0, sbytes.length);
-        log.info("sbyte.len: {}, ba.len: {}", sbytes.length, ba.length);
+        log.debug("sbyte.len: {}, ba.len: {}", sbytes.length, ba.length);
 
 //        byte[] xbytes = BByteUtil.toBytes("xyz");
 //        System.arraycopy(xbytes, 0, ba, ba.length, xbytes.length);
-//        log.info("xbyte.len: {}, ba.len: {}", xbytes.length, ba.length);
+//        log.debug("xbyte.len: {}, ba.len: {}", xbytes.length, ba.length);
 //        System.out.println(BByteUtil.toStr(ba));
 
         System.out.println(12 % 8);
