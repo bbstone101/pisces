@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Slf4j
 public class FileTask {
@@ -122,12 +123,12 @@ public class FileTask {
             log.debug("============ endTime: {}==========", endTime);
 
             long costTime = (endTime - rsp.getReqTs()) / 1000;
-            log.debug(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
+            log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
 
             ClientCache.removeTask(rsp.getId());
             return StatusEnum.COMPLETED;
         }
-        log.debug("recvSize: {}, saveSize: {}, fileSize: {}", recvSize, saveSize, fileSize);
+        log.info("recvSize: {}, saveSize: {}, fileSize: {}", recvSize, saveSize, fileSize);
         // all file data recv, but some save to disk fail
         if (recvSize == fileSize && recvSize == saveSize) {
             closeFos();
@@ -181,7 +182,8 @@ public class FileTask {
 
     private void resetSbuf() {
         spos = 0;
-        sbuf = new byte[SBUF_SIZE];
+//        Arrays.fill(sbuf, (byte)0);
+//        sbuf = new byte[SBUF_SIZE];
     }
 
     private void closeFos() {
