@@ -58,18 +58,16 @@ public final class FileServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
                             ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
-                            p.addLast(
-                                    // outbound
-//                                    new StringEncoder(CharsetUtil.UTF_8), // outbound
 
-                                    // inbound
-//                                    new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter), // inbound
-                                    new DelimiterBasedFrameDecoder(8192, delimiter), // inbound
-//                                    new ChunkedWriteHandler(), // outbound
-                                    new ProtobufDecoder(BFileMsg.BFileReq.getDefaultInstance()), // inboud
-                                    new FileServerHandler()); // inbound(String)
+                            ChannelPipeline p = ch.pipeline();
+                            // outbound (default ByteBuf)
+                            // no encoder, direct send ByteBuf
+
+                            // inbound(decode by the delimiter, then forward to protobuf decoder, last forward to handler)
+                            p.addLast(new DelimiterBasedFrameDecoder(8192, delimiter)); // frameLen = BFileReq bytes
+                            p.addLast(new ProtobufDecoder(BFileMsg.BFileReq.getDefaultInstance()));
+                            p.addLast(new FileServerHandler());
                         }
                     });
 

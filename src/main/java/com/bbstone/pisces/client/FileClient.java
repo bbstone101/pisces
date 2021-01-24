@@ -56,16 +56,17 @@ public final class FileClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
                             ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
-                            // outbound
+
+                            ChannelPipeline p = ch.pipeline();
+                            // outbound(BFileReq)
                             p.addLast(new ProtobufEncoder());
 
-                            // inbound
-                            // ----- decode and handle FileRegion data stream
-                            p.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter)); // chunkedFile default is 8192, but delimiter ctontains 3 chars
-//                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter)); // chunkedFile default is 8192, but delimiter ctontains 3 chars
-                            p.addLast(new FileClientHandler()); // stream decode by delimite
+                            // ----- decode and handle (BFileRsp + FileRegion) data stream
+                            // inbound frameLen = chunkSize[default: 8192] + BFileRsp header)
+                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
+                            // inbound stream handler
+                            p.addLast(new FileClientHandler());
                         }
                     });
 
