@@ -1,4 +1,4 @@
-package com.bbstone.pisces.client;
+package com.bbstone.pisces.client.base;
 
 import com.bbstone.pisces.client.cmd.CmdHandler;
 import com.bbstone.pisces.client.cmd.DirRspHandler;

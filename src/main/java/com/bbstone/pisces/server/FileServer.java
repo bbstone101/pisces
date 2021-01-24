@@ -17,7 +17,7 @@ package com.bbstone.pisces.server;
 
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.BFileUtil;
+import com.bbstone.pisces.server.base.CmdRegister;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;

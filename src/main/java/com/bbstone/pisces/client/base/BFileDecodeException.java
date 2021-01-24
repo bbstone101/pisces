@@ -1,4 +1,4 @@
-package com.bbstone.pisces.client;
+package com.bbstone.pisces.client.base;
 
 public class BFileDecodeException extends Throwable {
     public BFileDecodeException() {

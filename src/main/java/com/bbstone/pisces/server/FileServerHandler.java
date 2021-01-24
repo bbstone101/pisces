@@ -17,6 +17,7 @@
 package com.bbstone.pisces.server;
 
 import com.bbstone.pisces.proto.BFileMsg;
+import com.bbstone.pisces.server.base.ReqDispatcher;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

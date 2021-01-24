@@ -1,4 +1,4 @@
-package com.bbstone.pisces.util;
+package com.bbstone.pisces;
 
 import com.twmacinta.util.MD5;
 import io.netty.util.CharsetUtil;

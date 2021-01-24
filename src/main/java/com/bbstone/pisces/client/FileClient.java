@@ -15,6 +15,7 @@
  */
 package com.bbstone.pisces.client;
 
+import com.bbstone.pisces.client.base.ClientCmdRegister;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.util.ConstUtil;
 import io.netty.bootstrap.Bootstrap;

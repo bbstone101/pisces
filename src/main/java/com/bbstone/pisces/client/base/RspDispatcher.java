@@ -1,9 +1,6 @@
-package com.bbstone.pisces.client;
+package com.bbstone.pisces.client.base;
 
 import com.bbstone.pisces.client.cmd.CmdHandler;
-import com.bbstone.pisces.client.storage.ClientCache;
-import com.bbstone.pisces.client.task.RecvTask;
-import com.bbstone.pisces.comm.ITask;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import com.google.protobuf.InvalidProtocolBufferException;

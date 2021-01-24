@@ -1,4 +1,4 @@
-package com.bbstone.pisces.server;
+package com.bbstone.pisces.server.base;
 
 import com.bbstone.pisces.server.cmd.CmdHandler;
 import com.bbstone.pisces.comm.BFileCmd;

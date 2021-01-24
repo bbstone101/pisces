@@ -1,8 +1,7 @@
 package com.bbstone.pisces.client.task;
 
-import com.bbstone.pisces.client.storage.ClientCache;
-import com.bbstone.pisces.comm.ITask;
-import com.bbstone.pisces.comm.TaskStatus;
+import com.bbstone.pisces.client.base.ClientCache;
+import com.bbstone.pisces.comm.StatusEnum;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 @Slf4j
-public class RecvTask implements ITask {
+public class FileTask {
 
     private String checksum = null;
     private long fileSize = 0; // total bytes
@@ -47,10 +46,10 @@ public class RecvTask implements ITask {
     // recv times
     private int counter = 0;
 
-    public RecvTask() {
+    public FileTask() {
     }
 
-    public RecvTask(BFileMsg.BFileRsp rsp) {
+    public FileTask(BFileMsg.BFileRsp rsp) {
         init(rsp);
     }
 
@@ -74,12 +73,12 @@ public class RecvTask implements ITask {
         }
     }
 
-    public TaskStatus appendFileData(byte[] fileData) {
+    public StatusEnum appendFileData(byte[] fileData) {
         counter++;
         int len = fileData.length;
         if (len <= 0) {
             log.warn("recv file data is 0.");
-            return TaskStatus.NO_DATA;
+            return StatusEnum.NO_DATA;
         }
         checkSBufSpace(len);
         // append data to storage buffer(sbuf)
@@ -101,7 +100,7 @@ public class RecvTask implements ITask {
                 // TODO save file data fail, retry 3 times,
                 //  then throw exception
                 //  or write down break point and skip this file, after all file downloaded, report this situation
-                return TaskStatus.ERR_SAVE_DATA;
+                return StatusEnum.ERR_SAVE_DATA;
             }
             saveSize += spos;
             log.info("saveOK, saveSize: {}, recvSize: {}, spos: {}, len: {}", saveSize, recvSize, spos, len);
@@ -126,16 +125,16 @@ public class RecvTask implements ITask {
             log.debug(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
 
             ClientCache.removeTask(rsp.getId());
-            return TaskStatus.COMPLETED;
+            return StatusEnum.COMPLETED;
         }
         log.debug("recvSize: {}, saveSize: {}, fileSize: {}", recvSize, saveSize, fileSize);
         // all file data recv, but some save to disk fail
         if (recvSize == fileSize && recvSize == saveSize) {
             closeFos();
-            return TaskStatus.ERR_SAVE_DATA;
+            return StatusEnum.ERR_SAVE_DATA;
         }
         // unknown
-        return TaskStatus.CONTINUE;
+        return StatusEnum.CONTINUE;
     }
 
     /**

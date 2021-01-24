@@ -1,10 +1,9 @@
 package com.bbstone.pisces.client.cmd;
 
-import com.bbstone.pisces.client.storage.ClientCache;
-import com.bbstone.pisces.client.task.RecvTask;
-import com.bbstone.pisces.comm.TaskStatus;
+import com.bbstone.pisces.client.base.ClientCache;
+import com.bbstone.pisces.client.task.FileTask;
+import com.bbstone.pisces.comm.StatusEnum;
 import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.CtxUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 @Slf4j
 public class FileRspHandler implements CmdHandler {
@@ -30,13 +28,13 @@ public class FileRspHandler implements CmdHandler {
     public void handle(ChannelHandlerContext ctx, BFileMsg.BFileRsp rsp, ByteBuf msg) {
         log.debug("handling file(id: {})...", rsp.getId());
         byte[] fileData = parseFileData(msg);
-        RecvTask recvTask = null;
+        FileTask recvTask = null;
         if ((recvTask = ClientCache.getTask(rsp.getId())) == null) {
-            recvTask = new RecvTask(rsp);
+            recvTask = new FileTask(rsp);
             ClientCache.addTask(rsp.getId(), recvTask);
         }
-        TaskStatus status = recvTask.appendFileData(fileData);
-        if (status == TaskStatus.COMPLETED) {
+        StatusEnum status = recvTask.appendFileData(fileData);
+        if (status == StatusEnum.COMPLETED) {
             // request next file
             String nextFile = CtxUtil.reqNextFile(ctx);
             log.debug("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);

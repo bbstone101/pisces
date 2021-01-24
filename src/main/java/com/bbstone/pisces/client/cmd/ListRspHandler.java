@@ -1,16 +1,11 @@
 package com.bbstone.pisces.client.cmd;
 
 import com.alibaba.fastjson.JSON;
-import com.bbstone.pisces.client.storage.ClientCache;
-import com.bbstone.pisces.comm.BFileCmd;
+import com.bbstone.pisces.client.base.ClientCache;
 import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.BFileUtil;
-import com.bbstone.pisces.util.ConstUtil;
 import com.bbstone.pisces.util.CtxUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

@@ -1,6 +1,6 @@
-package com.bbstone.pisces.client.storage;
+package com.bbstone.pisces.client.base;
 
-import com.bbstone.pisces.client.task.RecvTask;
+import com.bbstone.pisces.client.task.FileTask;
 import com.bbstone.pisces.util.BByteUtil;
 import com.twmacinta.util.MD5;
 import org.apache.commons.collections.map.HashedMap;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ClientCache {
 
-    private static Map<String, RecvTask> runningTasks = new HashedMap();
+    private static Map<String, FileTask> runningTasks = new HashedMap();
     private static Map<String, String> serverFiles = new HashMap<>();
 
     public static String nextFile() {
@@ -34,11 +34,11 @@ public class ClientCache {
         }
     }
 
-    public static RecvTask getTask(String id) {
+    public static FileTask getTask(String id) {
         return runningTasks.get(id);
     }
 
-    public static void addTask(String id, RecvTask task) {
+    public static void addTask(String id, FileTask task) {
         runningTasks.put(id, task);
     }
 

@@ -1,12 +1,8 @@
 package com.bbstone.pisces.comm;
 
-public enum TaskStatus {
+public enum StatusEnum {
 
-    STARTED(1, "started"),
-    RUNNING(2, "running"),
-    COMPLETED(3, "completed"),
-
-//    ALL_RECV(1001, "All File Data Received"),
+    COMPLETED(1001, "completed"),
     NO_DATA(1002, "Received Empty File Data"),
     ERR_SAVE_DATA(1003, "Save File Data To Disk Error"),
     CONTINUE(1004, "Continue Append Next File Data"),
@@ -17,7 +13,7 @@ public enum TaskStatus {
     private int code;
     private String descp;
 
-    TaskStatus(int code, String descp) {
+    StatusEnum(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
