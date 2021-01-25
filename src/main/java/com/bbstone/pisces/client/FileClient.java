@@ -15,6 +15,7 @@
  */
 package com.bbstone.pisces.client;
 
+import com.bbstone.pisces.client.base.ClientCache;
 import com.bbstone.pisces.client.base.ClientCmdRegister;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.util.ConstUtil;
@@ -27,7 +28,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
+
+import java.io.File;
 
 /**
  * Sends one message when a connection is open and echoes back any received
@@ -42,11 +48,26 @@ public final class FileClient {
         static final int PORT = Integer.parseInt(System.getProperty("port", "8080"));
         static final int SIZE = Integer.parseInt(System.getProperty("size", "256"));
         */
+    static final boolean SSL = Config.sslEnabled;
     static final String HOST = Config.host;
     static final int PORT = Config.port;
 
     public static void main(String[] args) throws Exception {
         ClientCmdRegister.init();
+//        ClientCache.cleanAll();
+        // Configure SSL.
+        final SslContext sslCtx;
+        if (SSL) {
+//            SelfSignedCertificate ssc = new SelfSignedCertificate();
+//            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+
+            File certChainFile = new File(Config.clientSSLCertChainFile);
+            File keyFile = new File(Config.clientSSLKeyFile);
+            File rootFile = new File(Config.clientSSLRootFile);
+            sslCtx = SslContextBuilder.forClient().keyManager(certChainFile, keyFile).trustManager(rootFile).build();
+        } else {
+            sslCtx = null;
+        }
         // Configure the client.
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -57,15 +78,21 @@ public final class FileClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
 
                             ChannelPipeline p = ch.pipeline();
+                            if (sslCtx != null) {
+                                p.addLast(sslCtx.newHandler(ch.alloc()));
+                            }
                             // outbound(BFileReq)
                             p.addLast(new ProtobufEncoder());
 
                             // ----- decode and handle (BFileRsp + FileRegion) data stream
                             // inbound frameLen = chunkSize[default: 8192] + BFileRsp header)
-                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
+                            ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
+                            p.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter));
+//                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
+                            // if os not support zero-copy, used ChunkedWriteHandler
+                            p.addLast(new ChunkedWriteHandler());
                             // inbound stream handler
                             p.addLast(new FileClientHandler());
                         }

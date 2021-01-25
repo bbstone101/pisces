@@ -1,36 +1,53 @@
 package com.bbstone.pisces.client.base;
 
 import com.bbstone.pisces.client.cmd.CmdHandler;
+import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
+import com.bbstone.pisces.util.BByteUtil;
 import com.bbstone.pisces.util.BFileUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.twmacinta.util.MD5;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * server response will dispatch to different client cmdHandler according stream prefix and cmd
- *
  */
 @Slf4j
 public class RspDispatcher {
 
     public static void dispatch(ChannelHandlerContext ctx, ByteBuf msg) {
-//        log.debug("[in dispatch] -> client recv total msg readableBytes: {}", msg.readableBytes());
-
+        /*
+        BFileMsg.BFileRsp rsp = null;
+        // ssl enabled, receiving a file, server only send BFileRsp info once
+        if (Config.sslEnabled) { // ChunkedFile mode
+            String recvFileKey = ClientCache.currRecvFileKey();
+            if (StringUtils.isBlank(recvFileKey)) { // the first chunk with BFileRsp header
+                rsp = parseFileInfo(msg);
+                ClientCache.addRspInfo(recvFileKey, rsp);
+            } else {
+                rsp = ClientCache.getRspInfo(recvFileKey);
+            }
+        } else { // FileRegion(zero-copy) mode,
+            // zero-copy FileRegion mode, server will send BFileRsp every time with file data
+            rsp = parseFileInfo(msg);
+        }
+*/
         BFileMsg.BFileRsp rsp = parseFileInfo(msg);
         String cmd = rsp.getCmd();
         CmdHandler cmdHandler = ClientCmdRegister.getHandler(cmd);
-        if(cmdHandler == null) {
+        if (cmdHandler == null) {
             log.error("not found cmdHandler for command: {}, please register first.", cmd);
             return;
         }
-
         cmdHandler.handle(ctx, rsp, msg);
     }
 
     /**
      * Parse BFile Info from msg
+     *
      * @param msg
      * @return
      */
@@ -53,8 +70,7 @@ public class RspDispatcher {
                 log.error("parse BFileRs from stream error.", e);
                 throw new RuntimeException("parse BFileRs from stream error.");
             }
-        }
-        else {
+        } else {
             throw new RuntimeException("recv data is not BFile format.");
         }
         return rsp;

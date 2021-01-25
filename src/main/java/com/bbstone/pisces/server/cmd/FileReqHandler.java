@@ -8,10 +8,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultFileRegion;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.stream.ChunkedFile;
+import io.netty.handler.stream.ChunkedNioFile;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -36,7 +43,7 @@ public class FileReqHandler implements CmdHandler {
 
         sendFile(ctx, serverpath, reqTs);
         log.debug("------> server done sent file: {}", serverpath);
-/*
+        /*
         List<String> fileList = BFileUtil.findFiles(serverpath);
         for (String file : fileList) {
             sendFile(ctx, file, reqTs);
@@ -82,7 +89,6 @@ public class FileReqHandler implements CmdHandler {
     }
 
     /**
-     *
      * Non-standard format(append byte[] data after Rsp object, because cannot retrieve the data and set to Rsp.chunkData:
      * e.g. FileRsp(cmd: CMD_REQ) data format(only for FileRegion which directly write file data to channel):
      * +---------------------------------------------------------------------------------+
@@ -92,7 +98,7 @@ public class FileReqHandler implements CmdHandler {
      *
      * @param ctx
      * @param serverpath -  server file full path
-     * @param reqTs    - timestamp of client request this file
+     * @param reqTs      - timestamp of client request this file
      */
     private void sendFile(ChannelHandlerContext ctx, String serverpath, long reqTs) {
         log.debug(">>>>>>>>>> sending file/dir: {}", serverpath);
@@ -104,14 +110,25 @@ public class FileReqHandler implements CmdHandler {
         String checksum = BFileUtil.checksum(new File(serverpath));
 
         // file content size of server file(which path is filepath)
-        long filelen = new File(serverpath).length();
+        File serverFile = new File(serverpath);
+        FileChannel fileChannel = null;
+        RandomAccessFile raf = null;
+        try {
+            raf = new RandomAccessFile(serverFile, "r");
+            fileChannel = raf.getChannel();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        long filelen = serverFile.length();
         log.debug("filelen: {}, write BFileRsp to client......", filelen);
 
         long startTime = System.currentTimeMillis();
         // ------------ send file chunk by chunk
+
+//        if (ctx.pipeline().get(SslHandler.class) == null) {
         long pos = 0;
         int chunkCounter = 0;
-        long chunkSize = 0;
+        int chunkSize = 0;
         while ((filelen - pos) > 0) {
             /**
              * Standard Rsp format like:
@@ -132,19 +149,45 @@ public class FileReqHandler implements CmdHandler {
              * | chunk_data | delimiter |
              * +------------------------+
              */
-            chunkSize = Math.min(ConstUtil.DEFAULT_CHUNK_SIZE, (filelen - pos));
+            chunkSize = (int) Math.min(ConstUtil.DEFAULT_CHUNK_SIZE, (filelen - pos));
             log.debug("current pos: {}, will write {} bytes to channel.", pos, chunkSize);
-            // DefaultFileRegion need to pass new File(filepath) other than raf.getChannel(),
-            // because every time new DefaultFileRegion, open a new raf
-            ctx.write(new DefaultFileRegion(new File(serverpath), pos, chunkSize));
+            // SSL enabled - cannot use zero-copy file transfer.
+            if (ctx.pipeline().get(SslHandler.class) != null) {
+                try {
+                    ctx.write(new ChunkedFile(raf, pos, filelen, chunkSize)); // default chunkSize 8192
+//                    ctx.write(new ChunkedNioFile(fileChannel, pos, filelen, chunkSize)); // default chunkSize 8192
+                } catch (IOException e) {
+                    log.error("write chunked Nio File error. will send 0 len file data.", e);
+                }
+            } else {
+                // SSL not enabled - can use zero-copy file transfer.
+//                ctx.write(new DefaultFileRegion(raf.getChannel(), 0, length));
+                // DefaultFileRegion need to pass new File(filepath) other than raf.getChannel(),
+                // because every time new DefaultFileRegion, open a new raf
+                ctx.write(new DefaultFileRegion(serverFile, pos, chunkSize));
+            }
+
+
             ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
             log.debug("output file: {}", serverpath);
             chunkCounter++;
             pos += chunkSize;
-            log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", chunkCounter, (rspInfoLen+chunkSize), pos, filelen);
+            log.info("=============== wrote the {} chunk, wrote len: {}, progress: {}/{} =============", chunkCounter, (rspInfoLen + chunkSize), pos, filelen);
 
         }
-        log.info("write file({}) to channel cost time: {} sec.", serverpath, (System.currentTimeMillis() - startTime)/1000);
+//        } else {
+//            ByteBuf rspBuf = BFileUtil.buildRspFile(serverpath, filelen, checksum, reqTs);
+//            int rspInfoLen = rspBuf.readableBytes();
+//            ctx.write(rspBuf);
+//            // SSL enabled - cannot use zero-copy file transfer.
+//            try {
+//                ctx.write(new ChunkedNioFile(serverFile)); // default chunkSize 8192
+//                ctx.writeAndFlush(Unpooled.wrappedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8)));
+//            } catch (IOException e) {
+//                log.error("write chunked Nio File error. will send 0 len file data.", e);
+//            }
+//        }
+        log.info("write file({}) to channel cost time: {} sec.", serverpath, (System.currentTimeMillis() - startTime) / 1000);
 
     }
 

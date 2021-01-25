@@ -14,6 +14,7 @@ public class CtxUtil {
 
     public static String reqNextFile(ChannelHandlerContext ctx) {
         String nextFile = ClientCache.nextFile();
+        log.info("nextFile: {}", nextFile);
         if (StringUtils.isNotBlank(nextFile)) {
             log.debug("after list files, req to download nextFile: {}", nextFile);
             // FileReq

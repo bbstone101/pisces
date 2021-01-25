@@ -1,19 +1,21 @@
 package com.bbstone.pisces.client.base;
 
 import com.bbstone.pisces.client.task.FileTask;
+import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BByteUtil;
 import com.twmacinta.util.MD5;
 import org.apache.commons.collections.map.HashedMap;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClientCache {
 
     private static Map<String, FileTask> runningTasks = new HashedMap();
     private static Map<String, String> serverFiles = new HashMap<>();
+
+    /** key: md5(recvFile), value: the BFileRsp info */
+    private static Map<String, BFileMsg.BFileRsp> rspInfoMap = new HashMap<>();
+    private static volatile String recvFileKey = null;
 
     public static String nextFile() {
         Iterator<String> it = serverFiles.keySet().iterator();
@@ -21,6 +23,7 @@ public class ClientCache {
             String key = it.next();
             String file = serverFiles.get(key);
             serverFiles.remove(key);
+            recvFileKey = MD5.asHex(BByteUtil.toBytes(file));
             return file;
         }
         return null;
@@ -46,7 +49,31 @@ public class ClientCache {
         runningTasks.remove(id);
     }
 
+    public static String currRecvFileKey() {
+        return recvFileKey;
+    }
 
+
+    public static BFileMsg.BFileRsp getRspInfo(String key) {
+        return rspInfoMap.get(key);
+    }
+
+    public static void addRspInfo(String key, BFileMsg.BFileRsp rsp) {
+        rspInfoMap.put(key, rsp);
+    }
+
+    public static void removeRspInfo(String key) {
+        rspInfoMap.remove(key);
+    }
+
+
+
+    public static void cleanAll() {
+        recvFileKey = null;
+        rspInfoMap = Collections.emptyMap();
+        serverFiles = Collections.emptyMap();
+        runningTasks = Collections.emptyMap();
+    }
 
 
 }

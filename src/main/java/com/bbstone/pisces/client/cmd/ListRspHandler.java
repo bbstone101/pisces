@@ -17,10 +17,11 @@ public class ListRspHandler implements CmdHandler {
     public void handle(ChannelHandlerContext ctx, BFileMsg.BFileRsp rsp, ByteBuf msg) {
 //            String filepath = rsp.getFilepath();
 //            String checksum = rsp.getChecksum();
-            String rspData = rsp.getRspData();
-            log.debug("client recv fileTree: \n / \n{}", rspData);
+        String rspData = rsp.getRspData();
+        log.debug("client recv fileTree: \n / \n{}", rspData);
 
         List<String> fileList = JSON.parseArray(rspData, String.class);
+        log.info("fileList: {}", JSON.toJSONString(fileList));
         ClientCache.init(fileList);
 
         CtxUtil.reqNextFile(ctx);

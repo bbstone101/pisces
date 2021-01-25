@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 @Slf4j
-public class FileTask {
+public class FileTask implements ITask {
 
     private String checksum = null;
     private long fileSize = 0; // total bytes

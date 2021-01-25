@@ -30,7 +30,13 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
+
+import java.io.File;
 
 /**
  * Server that accept the path of a file an echo back its content.
@@ -42,10 +48,25 @@ public final class FileServer {
         // Use the same default port with the telnet example so that we can use the telnet client example to access it.
         static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8992" : "8080"));
     */
+    static final boolean SSL = Config.sslEnabled;
     static final int PORT = Config.port;
 
     public static void main(String[] args) throws Exception {
         CmdRegister.init();
+
+        // Configure SSL.
+        final SslContext sslCtx;
+        if (SSL) {
+//            SelfSignedCertificate ssc = new SelfSignedCertificate();
+//            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+
+            File certChainFile = new File(Config.serverSSLCertChainFile);
+            File keyFile = new File(Config.serverSSLKeyFile);
+            File rootFile = new File(Config.serverSSLRootFile);
+            sslCtx = SslContextBuilder.forServer(certChainFile, keyFile).trustManager(rootFile).clientAuth(ClientAuth.REQUIRE).build();
+        } else {
+            sslCtx = null;
+        }
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -58,15 +79,20 @@ public final class FileServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
 
                             ChannelPipeline p = ch.pipeline();
+                            if (sslCtx != null) {
+                                p.addLast(sslCtx.newHandler(ch.alloc()));
+                            }
                             // outbound (default ByteBuf)
                             // no encoder, direct send ByteBuf
 
                             // inbound(decode by the delimiter, then forward to protobuf decoder, last forward to handler)
+                            ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
                             p.addLast(new DelimiterBasedFrameDecoder(8192, delimiter)); // frameLen = BFileReq bytes
                             p.addLast(new ProtobufDecoder(BFileMsg.BFileReq.getDefaultInstance()));
+                            // if os not support zero-copy, used ChunkedWriteHandler
+                            p.addLast(new ChunkedWriteHandler());
                             p.addLast(new FileServerHandler());
                         }
                     });

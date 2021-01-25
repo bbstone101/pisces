@@ -7,6 +7,7 @@ import com.google.protobuf.ByteString;
 import com.twmacinta.util.MD5;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledDirectByteBuf;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -420,7 +421,10 @@ public class BFileUtil {
         System.arraycopy(rspWithoutFileData, 0, data, cpos, rspWithoutFileData.length);
 
         log.debug("data.len: {}, bytes: {}", data.length, data.toString());
-        return Unpooled.wrappedBuffer(data);
+        ByteBuf bbuf = Unpooled.directBuffer(data.length);
+        bbuf.writeBytes(data);
+//        return Unpooled.wrappedBuffer(data);
+        return bbuf;
     }
 
 
