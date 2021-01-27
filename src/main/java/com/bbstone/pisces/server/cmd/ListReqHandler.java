@@ -1,6 +1,7 @@
 package com.bbstone.pisces.server.cmd;
 
 import com.alibaba.fastjson.JSON;
+import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import com.bbstone.pisces.util.ConstUtil;
@@ -42,7 +43,7 @@ public class ListReqHandler implements CmdHandler {
         */
 
         String serverFullPath = BFileUtil.getServerDir() + filepath;
-        List<String> fileList = BFileUtil.findFiles(serverFullPath);
+        List<BFileInfo> fileList = BFileUtil.findFiles(serverFullPath);
         String filesJson = JSON.toJSONString(fileList);
         ByteBuf rspBuf = BFileUtil.buildRspList(serverFullPath, filesJson, reqTs);
         ctx.write(rspBuf);

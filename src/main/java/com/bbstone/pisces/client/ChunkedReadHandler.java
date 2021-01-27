@@ -1,0 +1,43 @@
+package com.bbstone.pisces.client;
+
+import com.bbstone.pisces.client.base.ClientCache;
+import com.bbstone.pisces.client.base.ClientCmdRegister;
+import com.bbstone.pisces.client.cmd.CmdHandler;
+import com.bbstone.pisces.client.task.FileRspHandlerHelper;
+import com.bbstone.pisces.config.Config;
+import com.bbstone.pisces.proto.BFileMsg;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * sslEnabled, not used zero-copy FileRegion mode,
+ * ChunkedFile data will be handled by this handler
+ *
+ */
+@Slf4j
+public class ChunkedReadHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+        // incoming chunked file
+        if (Config.sslEnabled && StringUtils.isNotBlank(ClientCache.currRecvFileKey())) {
+            // ----- chunked file data arrival
+            log.info("currRecvFileKey: {}", ClientCache.currRecvFileKey());
+            BFileMsg.BFileRsp rsp = ClientCache.getRspInfo(ClientCache.currRecvFileKey());
+            if (rsp == null) {
+                log.error("not found BFileRsp via currRecvFileKey: {}", ClientCache.currRecvFileKey());
+                throw new RuntimeException("not found BFileRsp");
+            }
+            FileRspHandlerHelper.handleFileData(ctx, rsp, msg);
+        } else { // not chunked file data, just forward msg next handler
+//            ctx.fireChannelRead(msg);
+            byte[] data = new byte[msg.readableBytes()];
+            msg.readBytes(data);
+            ctx.fireChannelRead(Unpooled.wrappedBuffer(data));
+            return;
+        }
+    }
+}

@@ -1,8 +1,12 @@
 package com.bbstone.pisces;
 
+import com.alibaba.fastjson.JSON;
+import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.util.BByteUtil;
 import com.bbstone.pisces.util.BFileUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 public class BFileUtilTest {
@@ -68,15 +72,16 @@ public class BFileUtilTest {
 //        log.debug("xbyte.len: {}, ba.len: {}", xbytes.length, ba.length);
 //        System.out.println(BByteUtil.toStr(ba));
 
-        System.out.println(12 % 8);
-
-        System.out.println(System.getProperty("os.name"));
-
+//        System.out.println(12 % 8);
+//        System.out.println(System.getProperty("os.name"));
 //        String path = "D:\\aa\\bb\\c.txt";
-        String path = "D:/aa/bb/c.txt";
-        System.out.println(BFileUtil.convertToLocalePath(path));
+//        String path = "D:/aa/bb/c.txt";
+//        System.out.println(BFileUtil.convertToLocalePath(path));
 
-
+        List<BFileInfo> fileInfoList = BFileUtil.findFiles("/Users/bbstone/Downloads/pisces");
+        for (BFileInfo fileInfo : fileInfoList) {
+            System.out.println(JSON.toJSONString(fileInfo));
+        }
     }
 
 }

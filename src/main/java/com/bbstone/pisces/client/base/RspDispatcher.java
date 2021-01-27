@@ -19,22 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 public class RspDispatcher {
 
     public static void dispatch(ChannelHandlerContext ctx, ByteBuf msg) {
-        /*
-        BFileMsg.BFileRsp rsp = null;
-        // ssl enabled, receiving a file, server only send BFileRsp info once
-        if (Config.sslEnabled) { // ChunkedFile mode
-            String recvFileKey = ClientCache.currRecvFileKey();
-            if (StringUtils.isBlank(recvFileKey)) { // the first chunk with BFileRsp header
-                rsp = parseFileInfo(msg);
-                ClientCache.addRspInfo(recvFileKey, rsp);
-            } else {
-                rsp = ClientCache.getRspInfo(recvFileKey);
-            }
-        } else { // FileRegion(zero-copy) mode,
-            // zero-copy FileRegion mode, server will send BFileRsp every time with file data
-            rsp = parseFileInfo(msg);
-        }
-*/
         BFileMsg.BFileRsp rsp = parseFileInfo(msg);
         String cmd = rsp.getCmd();
         CmdHandler cmdHandler = ClientCmdRegister.getHandler(cmd);
@@ -42,7 +26,7 @@ public class RspDispatcher {
             log.error("not found cmdHandler for command: {}, please register first.", cmd);
             return;
         }
-        cmdHandler.handle(ctx, rsp, msg);
+        cmdHandler.handleNext(ctx, rsp, msg);
     }
 
     /**

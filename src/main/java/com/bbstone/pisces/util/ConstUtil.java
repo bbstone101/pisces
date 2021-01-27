@@ -14,6 +14,11 @@ public class ConstUtil {
 
     public static final String delimiter = "__10BBSTONE_BFILE_END01__";
 
+    /** directory */
+    public static final String BFILE_CAT_DIR = "D";
+    /** file */
+    public static final String BFILE_CAT_FILE = "F";
+
 
     public static final int ACK_OK = 0;
     public static final int ACK_FAIL = 1;

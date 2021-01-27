@@ -1,13 +1,13 @@
 package com.bbstone.pisces.util;
 
 import com.bbstone.pisces.comm.BFileCmd;
+import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.google.protobuf.ByteString;
 import com.twmacinta.util.MD5;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.buffer.UnpooledDirectByteBuf;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -96,26 +96,33 @@ public class BFileUtil {
      * @param filepath
      * @return
      */
-    public static List<String> findFiles(String filepath) {
+    public static List<BFileInfo> findFiles(String filepath) {
         if (Files.notExists(Paths.get(filepath))) {
             log.warn("not found file/directory: {}", filepath);
         }
-        List<String> fileList = new ArrayList<>();
+        List<BFileInfo> fileList = new ArrayList<>();
         File file = new File(filepath);
         if (Files.isDirectory(Paths.get(filepath))) {
-            level = -1; // reset
             findFile(fileList, new File(filepath));
         } else {
-            fileList.add(getServerRelativePath(file.getAbsolutePath()));
+            BFileInfo fileInfo = new BFileInfo(getServerRelativePath(file.getAbsolutePath()),
+                    ConstUtil.BFILE_CAT_FILE,
+                    checksum(file),
+                    file.length());
+            fileList.add(fileInfo);
         }
         return fileList;
     }
 
-    private static void findFile(List<String> fileList, File file) {
+    private static void findFile(List<BFileInfo> fileList, File file) {
         File[] flist = file.listFiles();
         Arrays.sort(flist);
         for (File subfile : flist) {
-            fileList.add(getServerRelativePath(subfile.getAbsolutePath()));
+            BFileInfo fileInfo = new BFileInfo(getServerRelativePath(subfile.getAbsolutePath()),
+                    subfile.isDirectory() ? ConstUtil.BFILE_CAT_DIR : ConstUtil.BFILE_CAT_FILE,
+                    checksum(subfile),
+                    subfile.length());
+            fileList.add(fileInfo);
             if (subfile.isDirectory()) {
                 findFile(fileList, subfile);
             }
@@ -123,10 +130,18 @@ public class BFileUtil {
     }
     // --------------------------
 
+    /**
+     * file is directory, md5(file_abs_path),
+     *
+     * file is file, return file fingerprint
+     *
+     * @param file - dir/file
+     * @return
+     */
     public static String checksum(File file) {
 //        long startTime = System.nanoTime();
         try {
-            return MD5.asHex(MD5.getHash(file));
+            return file.isDirectory() ? MD5.asHex(BByteUtil.toBytes(file.getAbsolutePath())) : MD5.asHex(MD5.getHash(file));
 //            return DigestUtils.md5DigestAsHex(new FileInputStream(filepath));
         } catch (IOException e) {
             log.error("calc file hash fail.", e);
@@ -176,6 +191,7 @@ public class BFileUtil {
      * @return
      */
     public static String getServerRelativePath(String serverFullPath) {
+        serverFullPath = getCanonicalPath(serverFullPath);
         if (Files.notExists(Paths.get(serverFullPath)) || !serverFullPath.startsWith(getServerDir())) {
             throw new RuntimeException(String.format("@param(filepath: %s) should be a exists server path and started with(%s).", serverFullPath, getServerDir()));
         }
@@ -386,11 +402,11 @@ public class BFileUtil {
         // BFile info
         String filepath = getServerRelativePath(serverpath);
         BFileMsg.BFileRsp rsp = BFileMsg.BFileRsp.newBuilder()
-                .setId(MD5.asHex(BByteUtil.toBytes(filepath)))
+                .setId(MD5.asHex(BByteUtil.toBytes(filepath))) // md5(serverRelativePath)
                 .setCmd(cmd) //BFileCmd.CMD_RSP)
                 .setFilepath(filepath) // relative path(not contains client.dir or server.dir)
                 .setFileSize(filesize)
-                .setChecksum(checksum)
+                .setChecksum(checksum) // file fingerprint/ md5(server_dir_abs_path)
                 .setRspData(StringUtils.trimToEmpty(rspData))
                 .setChunkData(chunkData == null ? ByteString.EMPTY : ByteString.copyFrom(chunkData))
                 .setReqTs(reqTs)

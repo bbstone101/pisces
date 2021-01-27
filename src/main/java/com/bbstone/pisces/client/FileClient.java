@@ -15,7 +15,6 @@
  */
 package com.bbstone.pisces.client;
 
-import com.bbstone.pisces.client.base.ClientCache;
 import com.bbstone.pisces.client.base.ClientCmdRegister;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.util.ConstUtil;
@@ -30,7 +29,6 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
 
 import java.io.File;
@@ -86,14 +84,15 @@ public final class FileClient {
                             // outbound(BFileReq)
                             p.addLast(new ProtobufEncoder());
 
+                            // --- inbound
+                            // if os not support zero-copy/sslEnabled, used this, must be the first inbound handler
+                            p.addLast(new ChunkedReadHandler());
+
                             // ----- decode and handle (BFileRsp + FileRegion) data stream
-                            // inbound frameLen = chunkSize[default: 8192] + BFileRsp header)
                             ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
-                            p.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter));
+                            // inbound frameLen = chunkSize[default: 8192] + BFileRsp header)
 //                            p.addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
-                            // if os not support zero-copy, used ChunkedWriteHandler
-                            p.addLast(new ChunkedWriteHandler());
-                            // inbound stream handler
+                            p.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter));
                             p.addLast(new FileClientHandler());
                         }
                     });

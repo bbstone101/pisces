@@ -12,7 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 @Slf4j
 public class FileTask implements ITask {
@@ -124,7 +123,7 @@ public class FileTask implements ITask {
 
             long costTime = (endTime - rsp.getReqTs()) / 1000;
             log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
-
+            ClientCache.resetRecvFileKey();
             ClientCache.removeTask(rsp.getId());
             return StatusEnum.COMPLETED;
         }

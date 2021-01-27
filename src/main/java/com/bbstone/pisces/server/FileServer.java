@@ -86,13 +86,13 @@ public final class FileServer {
                             }
                             // outbound (default ByteBuf)
                             // no encoder, direct send ByteBuf
+                            // if os not support zero-copy, used ChunkedWriteHandler
+                            p.addLast(new ChunkedWriteHandler());
 
                             // inbound(decode by the delimiter, then forward to protobuf decoder, last forward to handler)
                             ByteBuf delimiter = Unpooled.copiedBuffer(ConstUtil.delimiter.getBytes(CharsetUtil.UTF_8));
                             p.addLast(new DelimiterBasedFrameDecoder(8192, delimiter)); // frameLen = BFileReq bytes
                             p.addLast(new ProtobufDecoder(BFileMsg.BFileReq.getDefaultInstance()));
-                            // if os not support zero-copy, used ChunkedWriteHandler
-                            p.addLast(new ChunkedWriteHandler());
                             p.addLast(new FileServerHandler());
                         }
                     });
