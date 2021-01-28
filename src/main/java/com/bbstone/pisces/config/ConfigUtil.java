@@ -1,5 +1,6 @@
 package com.bbstone.pisces.config;
 
+import com.bbstone.pisces.util.BFileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,7 +17,8 @@ public class ConfigUtil {
         File file = null;
         if (StringUtils.isNotBlank(path) && path.startsWith(CLASSPATH_PREFIX)) {
             String classpath = path.substring(CLASSPATH_PREFIX.length());
-            log.debug("path: {}, classpath: {}", path, classpath);
+            classpath = BFileUtil.convertToLocalePath(classpath);
+            log.info("path: {}, classpath: {}", path, classpath);
             URI uri = null;
             try {
                 uri = Thread.currentThread().getContextClassLoader().getResource(classpath).toURI();

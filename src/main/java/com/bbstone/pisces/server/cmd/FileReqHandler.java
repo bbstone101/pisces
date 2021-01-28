@@ -179,7 +179,7 @@ public class FileReqHandler implements CmdHandler {
             }
         }
         log.info("write file({}) to channel cost time: {} sec.", serverpath, (System.currentTimeMillis() - startTime) / 1000);
-
+//        log.info("transferred files: {}/{}", );
     }
 
 }
