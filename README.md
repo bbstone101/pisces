@@ -68,7 +68,7 @@ pisces
 
 ```
 
-#配置server的文件下载目录和client的保存目录
+# 配置server的文件下载目录和client的保存目录
 
 ```
 
