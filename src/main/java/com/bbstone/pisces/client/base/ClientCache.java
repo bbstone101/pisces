@@ -1,11 +1,8 @@
 package com.bbstone.pisces.client.base;
 
-import com.bbstone.pisces.client.task.FileTask;
+import com.bbstone.pisces.client.base.task.FileTask;
 import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.BByteUtil;
-import com.bbstone.pisces.util.ConstUtil;
-import com.twmacinta.util.MD5;
 import org.apache.commons.collections.map.HashedMap;
 
 import java.util.*;

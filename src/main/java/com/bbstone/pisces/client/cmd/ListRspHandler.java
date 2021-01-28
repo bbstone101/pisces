@@ -2,10 +2,9 @@ package com.bbstone.pisces.client.cmd;
 
 import com.alibaba.fastjson.JSON;
 import com.bbstone.pisces.client.base.ClientCache;
-import com.bbstone.pisces.client.task.FileRspHandlerHelper;
+import com.bbstone.pisces.client.base.FileRspHandlerHelper;
 import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.proto.BFileMsg;
-import com.bbstone.pisces.util.CtxUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;

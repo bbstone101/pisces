@@ -1,9 +1,7 @@
 package com.bbstone.pisces.client.cmd;
 
 import com.bbstone.pisces.client.base.ClientCache;
-import com.bbstone.pisces.client.task.FileRspHandlerHelper;
-import com.bbstone.pisces.client.task.FileTask;
-import com.bbstone.pisces.comm.StatusEnum;
+import com.bbstone.pisces.client.base.FileRspHandlerHelper;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BByteUtil;

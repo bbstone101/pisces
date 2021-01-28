@@ -1,7 +1,7 @@
-package com.bbstone.pisces.client.task;
+package com.bbstone.pisces.client.base;
 
 import com.alibaba.fastjson.JSON;
-import com.bbstone.pisces.client.base.ClientCache;
+import com.bbstone.pisces.client.base.task.FileTask;
 import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.comm.StatusEnum;
 import com.bbstone.pisces.proto.BFileMsg;

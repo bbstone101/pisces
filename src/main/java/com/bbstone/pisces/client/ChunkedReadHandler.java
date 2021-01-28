@@ -1,9 +1,7 @@
 package com.bbstone.pisces.client;
 
 import com.bbstone.pisces.client.base.ClientCache;
-import com.bbstone.pisces.client.base.ClientCmdRegister;
-import com.bbstone.pisces.client.cmd.CmdHandler;
-import com.bbstone.pisces.client.task.FileRspHandlerHelper;
+import com.bbstone.pisces.client.base.FileRspHandlerHelper;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import io.netty.buffer.ByteBuf;
