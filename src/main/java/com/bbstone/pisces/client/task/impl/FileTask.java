@@ -1,6 +1,8 @@
-package com.bbstone.pisces.client.base.task;
+package com.bbstone.pisces.client.task.impl;
 
 import com.bbstone.pisces.client.base.ClientCache;
+import com.bbstone.pisces.client.task.ITask;
+import com.bbstone.pisces.client.task.TaskListener;
 import com.bbstone.pisces.comm.StatusEnum;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
@@ -12,9 +14,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class FileTask implements ITask {
+
+    private List<TaskListener> listener = new ArrayList<>();
 
     private String checksum = null;
     private long fileSize = 0; // total bytes
@@ -46,11 +52,15 @@ public class FileTask implements ITask {
     // recv times
     private int counter = 0;
 
-    public FileTask() {
+    FileTask() {
     }
 
     public FileTask(BFileMsg.BFileRsp rsp) {
         init(rsp);
+    }
+
+    public void addListner(TaskListener listner) {
+        listener.add(listner);
     }
 
     private void init(BFileMsg.BFileRsp rsp) {
@@ -88,7 +98,7 @@ public class FileTask implements ITask {
         recvSize += len;
 
 
-        log.info("recv file data len: {}, now progress: {}/{}({}%)", len, recvSize, fileSize, Math.floor((recvSize*1d/fileSize*1d) * 10000)/100 );
+        log.info("recv file data len: {}, progress: {}/{}({}%)", len, recvSize, fileSize, Math.floor((recvSize*1d/fileSize*1d) * 10000)/100 );
         boolean saveOK = false;
         // sbuf full or all file data received
         if (spos >= SBUF_SIZE || recvSize == fileSize) {
@@ -123,8 +133,11 @@ public class FileTask implements ITask {
 
             long costTime = (endTime - rsp.getReqTs()) / 1000;
             log.info(">>>>>>>>>>>>>>> file transfer cost time: {} sec. <<<<<<<<<<<<<<<<<", costTime);
-            ClientCache.resetRecvFileKey();
-            ClientCache.removeTask(rsp.getId());
+            for (TaskListener listener : listener) {
+                listener.onCompleted(rsp);
+            }
+//            ClientCache.resetRecvFileKey();
+//            ClientCache.removeTask(rsp.getId());
             return StatusEnum.COMPLETED;
         }
         log.info("recvSize: {}, saveSize: {}, fileSize: {}", recvSize, saveSize, fileSize);
@@ -181,8 +194,6 @@ public class FileTask implements ITask {
 
     private void resetSbuf() {
         spos = 0;
-//        Arrays.fill(sbuf, (byte)0);
-//        sbuf = new byte[SBUF_SIZE];
     }
 
     private void closeFos() {

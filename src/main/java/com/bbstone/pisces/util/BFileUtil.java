@@ -91,7 +91,7 @@ public class BFileUtil {
     }
 
     /**
-     * return all sub-files relatived to server.dir
+     * return all sub-files relative to server.dir
      *
      * @param filepath
      * @return
@@ -402,7 +402,7 @@ public class BFileUtil {
         // BFile info
         String filepath = getServerRelativePath(serverpath);
         BFileMsg.BFileRsp rsp = BFileMsg.BFileRsp.newBuilder()
-                .setId(MD5.asHex(BByteUtil.toBytes(filepath))) // md5(serverRelativePath)
+                .setId(getReqId(filepath)) // rspId = reqId
                 .setCmd(cmd) //BFileCmd.CMD_RSP)
                 .setFilepath(filepath) // relative path(not contains client.dir or server.dir)
                 .setFileSize(filesize)
@@ -446,12 +446,12 @@ public class BFileUtil {
 
     /**
      * @param cmd
-     * @param filepath
+     * @param filepath - file path relative server.dir
      * @return
      */
     public static BFileMsg.BFileReq buildReq(String cmd, String filepath) {
         BFileMsg.BFileReq req = BFileMsg.BFileReq.newBuilder()
-                .setId(MD5.asHex(BByteUtil.toBytes(filepath)))
+                .setId(getReqId(filepath))
                 .setCmd(cmd)
                 .setFilepath(filepath)
                 .setTs(System.currentTimeMillis())
@@ -460,7 +460,13 @@ public class BFileUtil {
         return req;
     }
 
-
+    /**
+     *
+     * @param filepath - file path relative server.dir
+     */
+    public static String getReqId(String filepath) {
+        return MD5.asHex(BByteUtil.toBytes(filepath));
+    }
 
 
 }

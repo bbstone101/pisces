@@ -1,4 +1,4 @@
-package com.bbstone.pisces.client.base.task;
+package com.bbstone.pisces.client.task;
 
 import com.bbstone.pisces.comm.StatusEnum;
 

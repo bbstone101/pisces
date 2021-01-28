@@ -59,9 +59,9 @@ public final class FileClient {
 //            SelfSignedCertificate ssc = new SelfSignedCertificate();
 //            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
 
-            File certChainFile = new File(Config.clientSSLCertChainFile);
-            File keyFile = new File(Config.clientSSLKeyFile);
-            File rootFile = new File(Config.clientSSLRootFile);
+            File certChainFile = Config.clientSSLCertChainFile;
+            File keyFile = Config.clientSSLKeyFile;
+            File rootFile = Config.clientSSLRootFile;
             sslCtx = SslContextBuilder.forClient().keyManager(certChainFile, keyFile).trustManager(rootFile).build();
         } else {
             sslCtx = null;

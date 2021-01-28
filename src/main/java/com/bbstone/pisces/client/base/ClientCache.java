@@ -1,25 +1,64 @@
 package com.bbstone.pisces.client.base;
 
-import com.bbstone.pisces.client.base.task.FileTask;
+import com.bbstone.pisces.client.task.impl.FileTask;
 import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.proto.BFileMsg;
+import com.bbstone.pisces.util.BFileUtil;
 import org.apache.commons.collections.map.HashedMap;
 
 import java.util.*;
 
+/**
+ * BFileRsp.id = BFileReq.id = reqId = md5(filepath)
+ * filepath is relative to server.dir
+ */
 public class ClientCache {
 
-    /** current running Tasks */
-    private static Map<String, FileTask> runningTasks = new HashedMap();
-
-    /** client received server filepath list, file data will transferred one by one */
+    /** client received server filepath list, file data will transferred one by one
+     *  key: BFileReq.id=reqId
+     **/
     private static Map<String, BFileInfo> serverFiles = new HashMap<>();
 
-    /** ChunkedFile mode -> key: md5(server_relative_path), value: the BFileRsp info */
+    /** current running Tasks, key: BFileReq.id=reqId */
+    private static Map<String, FileTask> runningTasks = new HashedMap();
+
+    // ------------- only for ChunkedFile mode start ----------------
+    /** ChunkedFile mode -> key: key: BFileReq.id=reqId, value: the BFileRsp info */
     private static Map<String, BFileMsg.BFileRsp> rspInfoMap = new HashMap<>();
 
-    /** ChunkedFile mode -> md5(server_relative_path) */
+    /** ChunkedFile mode, recvFileKey = (BFileReq.id=reqId)) */
     private static volatile String recvFileKey = null;
+
+
+    public static String currRecvFileKey() {
+        return recvFileKey;
+    }
+
+    public static void resetRecvFileKey() {
+        recvFileKey = null;
+    }
+
+    /**
+     * get transferred file BFileRsp info
+     *
+     * @param key
+     * @return
+     */
+    public static BFileMsg.BFileRsp getRspInfo(String key) {
+        return rspInfoMap.get(key);
+    }
+
+    public static void addRspInfo(String key, BFileMsg.BFileRsp rsp) {
+        recvFileKey = key; // update recvFileKey
+        rspInfoMap.put(key, rsp);
+    }
+
+    public static void removeRspInfo(String key) {
+        recvFileKey = null;
+        rspInfoMap.remove(key);
+    }
+
+    // ------------- only for ChunkedFile mode end ----------------
 
     /**
      * get next transferred filepath and update recvFileKey
@@ -32,8 +71,6 @@ public class ClientCache {
             String key = it.next();
             BFileInfo fileInfo = serverFiles.get(key);
             serverFiles.remove(key);
-            // md5(server_relative_path)
-//            recvFileKey = MD5.asHex(BByteUtil.toBytes(fileInfo.getFilepath()));
             return fileInfo;
         }
         return null;
@@ -41,14 +78,15 @@ public class ClientCache {
 
     /**
      * initial transferring file list
-     * <k, v> - <file.checksum, BFileInfo>
+     * <k, v> - <md5(filepath), BFileInfo>
+     *
+     *     filepath - relative to server.dir
      * @param fileList
      */
     public static void init(List<BFileInfo> fileList) {
         serverFiles.clear();
         for (BFileInfo file : fileList) {
-//            String key = MD5.asHex(BByteUtil.toBytes(file));
-            serverFiles.put(file.getChecksum(), file);
+            serverFiles.put(BFileUtil.getReqId(file.getFilepath()), file);
         }
     }
 
@@ -73,36 +111,6 @@ public class ClientCache {
     public static void removeTask(String id) {
         runningTasks.remove(id);
     }
-
-    public static String currRecvFileKey() {
-        return recvFileKey;
-    }
-
-    public static void resetRecvFileKey() {
-        recvFileKey = null;
-    }
-
-
-    /**
-     * get transferred file BFileRsp info
-     *
-     * @param key
-     * @return
-     */
-    public static BFileMsg.BFileRsp getRspInfo(String key) {
-        return rspInfoMap.get(key);
-    }
-
-    public static void addRspInfo(String key, BFileMsg.BFileRsp rsp) {
-        recvFileKey = key; // update recvFileKey
-        rspInfoMap.put(key, rsp);
-    }
-
-    public static void removeRspInfo(String key) {
-        recvFileKey = null;
-        rspInfoMap.remove(key);
-    }
-
 
 
     public static void cleanAll() {

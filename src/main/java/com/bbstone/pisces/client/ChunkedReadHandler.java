@@ -1,7 +1,7 @@
 package com.bbstone.pisces.client;
 
 import com.bbstone.pisces.client.base.ClientCache;
-import com.bbstone.pisces.client.base.FileRspHandlerHelper;
+import com.bbstone.pisces.client.base.FileRspHelper;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import io.netty.buffer.ByteBuf;
@@ -29,7 +29,7 @@ public class ChunkedReadHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 log.error("not found BFileRsp via currRecvFileKey: {}", ClientCache.currRecvFileKey());
                 throw new RuntimeException("not found BFileRsp");
             }
-            FileRspHandlerHelper.handleFileData(ctx, rsp, msg);
+            FileRspHelper.handleFileData(ctx, rsp, msg);
         } else { // not chunked file data, just forward msg next handler
 //            ctx.fireChannelRead(msg);
             byte[] data = new byte[msg.readableBytes()];

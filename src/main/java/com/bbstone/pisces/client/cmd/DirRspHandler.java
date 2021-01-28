@@ -1,6 +1,6 @@
 package com.bbstone.pisces.client.cmd;
 
-import com.bbstone.pisces.client.base.FileRspHandlerHelper;
+import com.bbstone.pisces.client.base.FileRspHelper;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
 import io.netty.buffer.ByteBuf;
@@ -19,12 +19,6 @@ public class DirRspHandler extends CmdHandler {
         BFileUtil.mkdir(clientdir);
         log.debug("client create dir: {}", clientdir);
 
-        FileRspHandlerHelper.handleNext(ctx);
-//        String nextFile = CtxUtil.reqNextFile(ctx);
-//        log.debug("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
-//        if (nextFile == null) {
-//            log.debug("all files received, try to stop client.");
-//            System.exit(0);
-//        }
+        FileRspHelper.handleNext(ctx);
     }
 }

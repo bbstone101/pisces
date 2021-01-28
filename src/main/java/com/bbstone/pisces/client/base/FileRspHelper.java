@@ -1,7 +1,8 @@
 package com.bbstone.pisces.client.base;
 
 import com.alibaba.fastjson.JSON;
-import com.bbstone.pisces.client.base.task.FileTask;
+import com.bbstone.pisces.client.task.impl.FileTask;
+import com.bbstone.pisces.client.task.impl.FileTaskListener;
 import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.comm.StatusEnum;
 import com.bbstone.pisces.proto.BFileMsg;
@@ -10,29 +11,26 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * used by FileRspHandler & ChunkedReadHandler
+ */
 @Slf4j
-public class FileRspHandlerHelper {
+public class FileRspHelper {
 
     public static void handleFileData(ChannelHandlerContext ctx, BFileMsg.BFileRsp rsp, ByteBuf msg) {
-        // -- zero-copy mode
         byte[] fileData = parseFileData(msg);
         FileTask fileTask = null;
         if ((fileTask = ClientCache.getTask(rsp.getId())) == null) {
             fileTask = new FileTask(rsp);
             ClientCache.addTask(rsp.getId(), fileTask);
+            fileTask.addListner(new FileTaskListener());
         }
+        // append part of file data to storage buffer(sbuf) of task
         StatusEnum status = fileTask.appendFileData(fileData);
+        // all file data received, try to start next file download
         if (status == StatusEnum.COMPLETED) {
             log.info("file({}) transfer complete.", rsp.getFilepath());
-            FileRspHandlerHelper.handleNext(ctx);
-            // request next file
-//            String nextFile = CtxUtil.reqNextFile(ctx);
-//            log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", nextFile);
-//            if (nextFile == null) {
-//                log.info("all files received, can stop client now(ChunkedWriteHandler need to wait).");
-//                ClientCache.cleanAll();
-//                System.exit(0);
-//            }
+            handleNext(ctx);
         }
     }
 
@@ -52,10 +50,14 @@ public class FileRspHandlerHelper {
     public static void handleNext(ChannelHandlerContext ctx) {
         BFileInfo nextFile = CtxUtil.reqNextFile(ctx);
         log.info("@@@@@@@@@@@@@@@@ request next file : {} @@@@@@@@@@", JSON.toJSONString(nextFile));
+        // all files downloaded
         if (nextFile == null) {
-            log.info("all files received, can stop client now(ChunkedWriteHandler need to wait).");
             ClientCache.cleanAll();
+            log.info("all files received, can stop client now(ChunkedWriteHandler need to wait).");
             System.exit(0);
         }
     }
+
+
+
 }

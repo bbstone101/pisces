@@ -35,13 +35,13 @@ public class Config {
 
 	public static String tempFilePostfix = config().getString("file.temp.postfix");
 
-	public static String serverSSLRootFile = config().getString("server.ssl.root_file", "");
-	public static String serverSSLKeyFile = config().getString("server.ssl.key_file", "");
-	public static String serverSSLCertChainFile = config().getString("server.ssl.cert_chain_file", "");
+	public static File serverSSLRootFile = ConfigUtil.readClasspathFile(config().getString("server.ssl.root_file", ""));
+	public static File serverSSLKeyFile = ConfigUtil.readClasspathFile(config().getString("server.ssl.key_file", ""));
+	public static File serverSSLCertChainFile = ConfigUtil.readClasspathFile(config().getString("server.ssl.cert_chain_file", ""));
 
-	public static String clientSSLRootFile = config().getString("client.ssl.root_file", "");
-	public static String clientSSLKeyFile = config().getString("client.ssl.key_file", "");
-	public static String clientSSLCertChainFile = config().getString("client.ssl.cert_chain_file", "");
+	public static File clientSSLRootFile = ConfigUtil.readClasspathFile(config().getString("client.ssl.root_file", ""));
+	public static File clientSSLKeyFile = ConfigUtil.readClasspathFile(config().getString("client.ssl.key_file", ""));
+	public static File clientSSLCertChainFile = ConfigUtil.readClasspathFile(config().getString("client.ssl.cert_chain_file", ""));
 
 
 	
