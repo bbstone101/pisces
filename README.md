@@ -99,7 +99,7 @@ server.dir=/Users/bbstone/Downloads/pisces/
 # ./server.sh
 ```
 
-# 启动client
+# Win启动client
 ```
 # cd pisces
 # client.bak

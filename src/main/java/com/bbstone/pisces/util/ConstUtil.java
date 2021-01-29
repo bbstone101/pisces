@@ -19,6 +19,9 @@ public class ConstUtil {
     /** file */
     public static final String BFILE_CAT_FILE = "F";
 
+    public static final String SERVER_DIR = "S";
+    public static final String CLIENT_DIR = "C";
+
 
     public static final int ACK_OK = 0;
     public static final int ACK_FAIL = 1;

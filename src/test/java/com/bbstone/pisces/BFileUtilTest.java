@@ -78,7 +78,7 @@ public class BFileUtilTest {
 //        String path = "D:/aa/bb/c.txt";
 //        System.out.println(BFileUtil.convertToLocalePath(path));
 
-        List<BFileInfo> fileInfoList = BFileUtil.findFiles("/Users/bbstone/Downloads/pisces");
+        List<BFileInfo> fileInfoList = BFileUtil.findServerFiles("/Users/bbstone/Downloads/pisces");
         for (BFileInfo fileInfo : fileInfoList) {
             System.out.println(JSON.toJSONString(fileInfo));
         }

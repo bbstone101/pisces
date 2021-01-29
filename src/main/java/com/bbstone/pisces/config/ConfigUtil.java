@@ -18,7 +18,7 @@ public class ConfigUtil {
         if (StringUtils.isNotBlank(path) && path.startsWith(CLASSPATH_PREFIX)) {
             String classpath = path.substring(CLASSPATH_PREFIX.length());
             classpath = BFileUtil.convertToLocalePath(classpath);
-            log.info("path: {}, classpath: {}", path, classpath);
+            log.debug("path: {}, classpath: {}", path, classpath);
             URI uri = null;
             try {
                 uri = Thread.currentThread().getContextClassLoader().getResource(classpath).toURI();

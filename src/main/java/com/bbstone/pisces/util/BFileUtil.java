@@ -90,41 +90,50 @@ public class BFileUtil {
         level--;
     }
 
+    public static List<BFileInfo> findServerFiles(String filepath) {
+        return findFiles(filepath, getServerDir());
+    }
+
+    public static List<BFileInfo> findClientFiles(String filepath) {
+        return findFiles(filepath, getClientDir());
+    }
+
+
     /**
      * return all sub-files relative to server.dir
      *
      * @param filepath
      * @return
      */
-    public static List<BFileInfo> findFiles(String filepath) {
+    private static List<BFileInfo> findFiles(String filepath, String basePath) {
         if (Files.notExists(Paths.get(filepath))) {
             log.warn("not found file/directory: {}", filepath);
         }
         List<BFileInfo> fileList = new ArrayList<>();
         File file = new File(filepath);
         if (Files.isDirectory(Paths.get(filepath))) {
-            findFile(fileList, new File(filepath));
+            findFile(fileList, file, basePath);
         } else {
-            BFileInfo fileInfo = new BFileInfo(getServerRelativePath(file.getAbsolutePath()),
-                    ConstUtil.BFILE_CAT_FILE,
-                    checksum(file),
-                    file.length());
+            String relativePath = getRelativePath(file.getAbsolutePath(), basePath);
+            BFileInfo fileInfo = new BFileInfo(relativePath, ConstUtil.BFILE_CAT_FILE, checksum(file), file.length());
             fileList.add(fileInfo);
         }
         return fileList;
     }
 
-    private static void findFile(List<BFileInfo> fileList, File file) {
+    private static void findFile(List<BFileInfo> fileList, File file, String basePath) {
         File[] flist = file.listFiles();
         Arrays.sort(flist);
         for (File subfile : flist) {
-            BFileInfo fileInfo = new BFileInfo(getServerRelativePath(subfile.getAbsolutePath()),
+            String relativePath = getRelativePath(subfile.getAbsolutePath(), basePath);
+            BFileInfo fileInfo = new BFileInfo(relativePath,
                     subfile.isDirectory() ? ConstUtil.BFILE_CAT_DIR : ConstUtil.BFILE_CAT_FILE,
-                    checksum(subfile),
+                    // dir- md5(relativePath), file - md5(file:file_content)
+                    subfile.isDirectory() ? checksum(relativePath) : checksum(subfile),
                     subfile.length());
             fileList.add(fileInfo);
             if (subfile.isDirectory()) {
-                findFile(fileList, subfile);
+                findFile(fileList, subfile, basePath);
             }
         }
     }
@@ -132,7 +141,7 @@ public class BFileUtil {
 
     /**
      * file is directory, md5(file_abs_path),
-     *
+     * <p>
      * file is file, return file fingerprint
      *
      * @param file - dir/file
@@ -148,6 +157,10 @@ public class BFileUtil {
 //            throw new RuntimeException("calc file hash fail.", e);
         }
         return null;
+    }
+
+    public static String checksum(String path) {
+        return checksum(BByteUtil.toBytes(path));
     }
 
 
@@ -191,11 +204,25 @@ public class BFileUtil {
      * @return
      */
     public static String getServerRelativePath(String serverFullPath) {
-        serverFullPath = getCanonicalPath(serverFullPath);
-        if (Files.notExists(Paths.get(serverFullPath)) || !serverFullPath.startsWith(getServerDir())) {
-            throw new RuntimeException(String.format("@param(filepath: %s) should be a exists server path and started with(%s).", serverFullPath, getServerDir()));
+        return getRelativePath(serverFullPath, getServerDir());
+//        serverFullPath = getCanonicalPath(serverFullPath);
+//        if (Files.notExists(Paths.get(serverFullPath)) || !serverFullPath.startsWith(getServerDir())) {
+//            throw new RuntimeException(String.format("@param(filepath: %s) should be a exists server path and started with(%s).", serverFullPath, getServerDir()));
+//        }
+//        return getCanonicalRelativePath(serverFullPath.substring(getServerDir().length()));
+    }
+
+    public static String getClientRelativePath(String clientFullPath) {
+        return getRelativePath(clientFullPath, getClientDir());
+    }
+
+    private static String getRelativePath(String fullPath, String basePath) {
+        fullPath = getCanonicalPath(fullPath);
+//        log.info("fullPath: {}, basePath: {}", fullPath, basePath);
+        if (Files.notExists(Paths.get(fullPath)) || !fullPath.startsWith(basePath)) {
+            throw new RuntimeException(String.format("@param(filepath: %s) should be an exists client path and started with(%s).", fullPath, basePath));
         }
-        return getCanonicalRelativePath(serverFullPath.substring(getServerDir().length()));
+        return getCanonicalRelativePath(fullPath.substring(basePath.length()));
     }
 
 //    public static String getClientFullPath(String serverRelativePath) {
@@ -225,6 +252,7 @@ public class BFileUtil {
      * @return
      */
     private static String getCanonicalPath(String path) {
+        path = convertToLocalePath(path);
         // append last File.separator for dir
         if (Files.isDirectory(Paths.get(path))) {
             path = (path.lastIndexOf(File.separator) == (path.length() - 1)) ? path : path + File.separator;
@@ -461,7 +489,6 @@ public class BFileUtil {
     }
 
     /**
-     *
      * @param filepath - file path relative server.dir
      */
     public static String getReqId(String filepath) {

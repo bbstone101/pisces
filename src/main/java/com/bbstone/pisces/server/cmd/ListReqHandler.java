@@ -43,7 +43,7 @@ public class ListReqHandler implements CmdHandler {
         */
 
         String serverFullPath = BFileUtil.getServerDir() + filepath;
-        List<BFileInfo> fileList = BFileUtil.findFiles(serverFullPath);
+        List<BFileInfo> fileList = BFileUtil.findServerFiles(serverFullPath);
         String filesJson = JSON.toJSONString(fileList);
         ByteBuf rspBuf = BFileUtil.buildRspList(serverFullPath, filesJson, reqTs);
         ctx.write(rspBuf);
