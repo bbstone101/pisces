@@ -35,42 +35,36 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
 /**
  * Server that accept the path of a file an echo back its content.
  */
+@Slf4j
 public final class FileServer {
-    /*
+//    static final boolean SSL = Config.sslEnabled();
+//    static final int PORT = Config.port();
 
-        static final boolean SSL = System.getProperty("ssl") != null;
-        // Use the same default port with the telnet example so that we can use the telnet client example to access it.
-        static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8992" : "8080"));
-    */
-    static final boolean SSL = Config.sslEnabled;
-    static final int PORT = Config.port;
-
-    public static void main(String[] args) throws Exception {
-        CmdRegister.init();
-
-        // Configure SSL.
-        final SslContext sslCtx;
-        if (SSL) {
-//            SelfSignedCertificate ssc = new SelfSignedCertificate();
-//            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-
-            File certChainFile = Config.serverSSLCertChainFile;
-            File keyFile = Config.serverSSLKeyFile;
-            File rootFile = Config.serverSSLRootFile;
-            sslCtx = SslContextBuilder.forServer(certChainFile, keyFile).trustManager(rootFile).clientAuth(ClientAuth.REQUIRE).build();
-        } else {
-            sslCtx = null;
-        }
+    public static void startup() {
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
+            CmdRegister.init();
+            // Configure SSL.
+            final SslContext sslCtx;
+            if (Config.sslEnabled()) {
+                File certChainFile = Config.serverSSLCertChainFile();
+                File keyFile = Config.serverSSLKeyFile();
+                File rootFile = Config.serverSSLRootFile();
+                sslCtx = SslContextBuilder.forServer(certChainFile, keyFile).trustManager(rootFile).clientAuth(ClientAuth.REQUIRE).build();
+            } else {
+                sslCtx = null;
+            }
+
+
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -98,10 +92,12 @@ public final class FileServer {
                     });
 
             // Start the server.
-            ChannelFuture f = b.bind(PORT).sync();
+            ChannelFuture f = b.bind(Config.port()).sync();
 
             // Wait until the server socket is closed.
             f.channel().closeFuture().sync();
+        } catch (Exception e) {
+            log.error("server startup error.", e);
         } finally {
             // Shut down all event loops to terminate all threads.
             bossGroup.shutdownGracefully();

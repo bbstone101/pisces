@@ -24,7 +24,7 @@ public class FileRspHandler extends CmdHandler {
         // ssl enabled, file transferred in ChunkedFile mode,
         // keep first chunkedFile msg(BFileRsp) in client cache,
         // the rest chunkedFile msg(file data) will be handle by ChunkedReadHandler, not this FileRspHandler
-        if (Config.sslEnabled) {
+        if (Config.sslEnabled()) {
             String recvFileKey = BFileUtil.getReqId(rsp.getFilepath());
             ClientCache.addRspInfo(recvFileKey, rsp);
             // subsequent chunked file data will be handle by ChunkedFileDataHandler before this

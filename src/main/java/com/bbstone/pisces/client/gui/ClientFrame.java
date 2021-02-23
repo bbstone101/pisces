@@ -37,8 +37,6 @@ public class ClientFrame extends javax.swing.JFrame {
 
         cardPanel = new javax.swing.JPanel();
         configPanel = new javax.swing.JPanel();
-        sslEnabledLabel = new javax.swing.JLabel();
-        sslEnabledComboBox = new javax.swing.JComboBox<>();
         infoScrollPane = new javax.swing.JScrollPane();
         infoTextArea = new javax.swing.JTextArea();
         portLabel = new javax.swing.JLabel();
@@ -56,7 +54,7 @@ public class ClientFrame extends javax.swing.JFrame {
         transferPanel = new javax.swing.JPanel();
         bottomToolBar = new javax.swing.JToolBar();
         fileTreeScrollPane = new javax.swing.JScrollPane();
-        fileTree = new javax.swing.JTree(TreeNodeBuilder.buildTreeNodes(Config.clientDir, "Client Dir"));
+        fileTree = new javax.swing.JTree(TreeNodeBuilder.buildTreeNodes(Config.clientDir(), "Client Dir"));
         contentPanel = new javax.swing.JSplitPane();
         fileInfoPanel = new javax.swing.JPanel();
         transferLabel = new javax.swing.JLabel();
@@ -87,10 +85,6 @@ public class ClientFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         cardPanel.setLayout(new java.awt.CardLayout());
-
-        sslEnabledLabel.setText("SSL Enabled: ");
-
-        sslEnabledComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Disabled", "Enabled" }));
 
         infoTextArea.setEditable(false);
         infoTextArea.setBackground(new java.awt.Color(238, 238, 238));
@@ -154,15 +148,10 @@ public class ClientFrame extends javax.swing.JFrame {
         configPanel.setLayout(configPanelLayout);
         configPanelLayout.setHorizontalGroup(
             configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(infoScrollPane)
-            .addGroup(configPanelLayout.createSequentialGroup()
+            .addComponent(infoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, configPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(configPanelLayout.createSequentialGroup()
-                        .addComponent(sslEnabledLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sslEnabledComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(configPanelLayout.createSequentialGroup()
                         .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(portLabel)
@@ -179,24 +168,21 @@ public class ClientFrame extends javax.swing.JFrame {
                                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addComponent(msgScrollPane)))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, configPanelLayout.createSequentialGroup()
-                .addContainerGap(360, Short.MAX_VALUE)
-                .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(clearButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(msgScrollPane)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, configPanelLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 513, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(clearButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addContainerGap())
         );
         configPanelLayout.setVerticalGroup(
             configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(configPanelLayout.createSequentialGroup()
                 .addComponent(infoScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sslEnabledComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sslEnabledLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(portLabel)
@@ -217,10 +203,11 @@ public class ClientFrame extends javax.swing.JFrame {
                     .addComponent(saveButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(msgScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(65, Short.MAX_VALUE))
         );
 
         cardPanel.add(configPanel, "configCard");
+        initConfigFormData();
 
         bottomToolBar.setRollover(true);
 
@@ -259,7 +246,7 @@ public class ClientFrame extends javax.swing.JFrame {
         fileInfoPanelLayout.setHorizontalGroup(
             fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, fileInfoPanelLayout.createSequentialGroup()
-                .addGap(0, 427, Short.MAX_VALUE)
+                .addGap(0, 308, Short.MAX_VALUE)
                 .addComponent(reloadButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(transferButton))
@@ -334,7 +321,7 @@ public class ClientFrame extends javax.swing.JFrame {
             .addGroup(transferPanelLayout.createSequentialGroup()
                 .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentPanel))
+                .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
         );
         transferPanelLayout.setVerticalGroup(
             transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -343,7 +330,7 @@ public class ClientFrame extends javax.swing.JFrame {
                     .addGroup(transferPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(contentPanel))
-                    .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE))
+                    .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bottomToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -399,11 +386,11 @@ public class ClientFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
         );
 
         pack();
@@ -439,7 +426,6 @@ public class ClientFrame extends javax.swing.JFrame {
         // clear msg text
         this.msgTextArea.setText(null);
         //
-        this.sslEnabledComboBox.setSelectedIndex(0);
         this.portTextField.setText(null);
         this.hostTextField.setText(null);
         this.clientDirTextField.setText(null);
@@ -449,6 +435,11 @@ public class ClientFrame extends javax.swing.JFrame {
         // TODO read form data from config.properties
         // clear msg text
         this.msgTextArea.setText(null);
+        // 
+        this.hostTextField.setText(Config.host());
+        this.portTextField.setText(String.valueOf(Config.port()));
+        this.clientDirTextField.setText(Config.clientDir());
+        
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
@@ -467,8 +458,15 @@ public class ClientFrame extends javax.swing.JFrame {
             return ;
         }
         // do save procedure
+        String host = StringUtils.trim(this.hostTextField.getText());
+        String port = StringUtils.trim(this.portTextField.getText());
+        String clientDir = StringUtils.trim(this.clientDirTextField.getText());
+        Config.setProperty(Config.SERVER_HOST_KEY, host);
+        Config.setProperty(Config.SERVER_PORT_KEY, port);
+        Config.setProperty(Config.CLIENT_DIR_KEY, clientDir);
+        Config.saveUpdate(); // batch save changes to file
         
-        
+        this.msgTextArea.setText("configurtion saved OK.");
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void selectDirButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectDirButtonActionPerformed
@@ -477,6 +475,11 @@ public class ClientFrame extends javax.swing.JFrame {
         dirChooser.setVal(val);
     }//GEN-LAST:event_selectDirButtonActionPerformed
 
+    private void initConfigFormData() {
+        this.hostTextField.setText(Config.host());
+        this.portTextField.setText(String.valueOf(Config.port()));
+        this.clientDirTextField.setText(Config.clientDir());
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
@@ -519,8 +522,6 @@ public class ClientFrame extends javax.swing.JFrame {
     private javax.swing.JButton resetButton;
     private javax.swing.JButton saveButton;
     private javax.swing.JButton selectDirButton;
-    private javax.swing.JComboBox<String> sslEnabledComboBox;
-    private javax.swing.JLabel sslEnabledLabel;
     private javax.swing.JLabel totalProgressLabel;
     private javax.swing.JButton transferButton;
     private javax.swing.JLabel transferLabel;

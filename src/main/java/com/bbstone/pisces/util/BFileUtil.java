@@ -2,6 +2,7 @@ package com.bbstone.pisces.util;
 
 import com.bbstone.pisces.comm.BFileCmd;
 import com.bbstone.pisces.comm.BFileInfo;
+import com.bbstone.pisces.comm.BFileTreeNode;
 import com.bbstone.pisces.config.Config;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.google.protobuf.ByteString;
@@ -88,6 +89,38 @@ public class BFileUtil {
             }
         }
         level--;
+    }
+
+
+    public static BFileTreeNode findServerFileTree(String filepath) {
+        return findFileTree(filepath, getServerDir());
+    }
+
+    private static BFileTreeNode findFileTree(String filepath, String basePath) {
+        if (Files.notExists(Paths.get(filepath))) {
+            log.warn("not found file/directory: {}", filepath);
+        }
+        File file = new File(filepath);
+        BFileTreeNode root = null;
+        if (Files.isDirectory(Paths.get(filepath))) {
+            root = new BFileTreeNode(file.getAbsolutePath(), file.getName(), ConstUtil.BFILE_CAT_DIR);
+            findFileTree(root, file, basePath);
+        } else {
+            root = new BFileTreeNode(file.getAbsolutePath(), file.getName(), ConstUtil.BFILE_CAT_FILE);
+        }
+        return root;
+    }
+
+    private static void findFileTree(BFileTreeNode parent, File file, String basePath) {
+        File[] flist = file.listFiles();
+        Arrays.sort(flist);
+        for (File subfile : flist) {
+            BFileTreeNode node = new BFileTreeNode(subfile.getAbsolutePath(), subfile.getName(),subfile.isDirectory() ? ConstUtil.BFILE_CAT_DIR : ConstUtil.BFILE_CAT_FILE);
+            parent.getChildren().add(node);
+            if (subfile.isDirectory()) {
+                findFileTree(node, subfile, basePath);
+            }
+        }
     }
 
     public static List<BFileInfo> findServerFiles(String filepath) {
@@ -230,7 +263,7 @@ public class BFileUtil {
 //    }
 
     public static String getClientDir() {
-        String clientdir = Config.clientDir;
+        String clientdir = Config.clientDir();
         if (StringUtils.isBlank(clientdir)) {
             throw new RuntimeException("client.dir property cannot be empty.");
         }
@@ -238,7 +271,7 @@ public class BFileUtil {
     }
 
     public static String getServerDir() {
-        String serverdir = Config.serverDir;
+        String serverdir = Config.serverDir();
         if (StringUtils.isBlank(serverdir)) {
             throw new RuntimeException("server.dir property cannot be empty.");
         }
@@ -319,7 +352,7 @@ public class BFileUtil {
      */
     public static String getClientTempFileFullPath(String clientFullPath) {
         if (isDir(clientFullPath)) return clientFullPath;
-        return clientFullPath + Config.tempFilePostfix;
+        return clientFullPath + Config.tempFilePostfix();
     }
 
     /**

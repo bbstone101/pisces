@@ -9,11 +9,13 @@ import java.util.Objects;
 @Data
 public class BFileInfo {
     //
-    // D - directory, F-file
     @JSONField(ordinal = 1)
     private String filepath;
+
+    // D - directory, F-file
     @JSONField(ordinal = 2)
     private String fileCat;
+
     // file fingerprint
     @JSONField(ordinal = 3)
     private String checksum;

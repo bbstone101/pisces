@@ -8,7 +8,7 @@ libdir="${wd}/lib";
 classpath="${libdir}/*:${wd}/conf";
 echo "using classpath: ${classpath}";
 
-mainclass="com.bbstone.pisces.client.FileClient";
+mainclass="com.bbstone.pisces.client.ClientStarter";
 
 
 java \

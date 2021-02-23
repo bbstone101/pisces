@@ -74,7 +74,7 @@ public class FileReqHandler implements CmdHandler {
 
     private void doSendDir(ChannelHandlerContext ctx, String serverpath, long reqTs) {
         log.debug("===|==|===|===|====dir: {}", serverpath);
-        if (Config.serverDir.equals(serverpath)) {
+        if (Config.serverDir().equals(serverpath)) {
             return;
         }
         /**

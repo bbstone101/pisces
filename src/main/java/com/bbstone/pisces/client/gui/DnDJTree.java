@@ -45,7 +45,7 @@ public class DnDJTree extends JTree implements DropTargetListener {
 //                DefaultMutableTreeNode top = new DefaultMutableTreeNode("Client Dir:");
 //                DefaultMutableTreeNode dir = new DefaultMutableTreeNode(Config.clientDir);
 //                top.add(dir);
-                TreeNode root = TreeNodeBuilder.buildTreeNodes(Config.clientDir, "Client DIR");
+                TreeNode root = TreeNodeBuilder.buildTreeNodes(Config.clientDir(), "Client DIR");
                 
                 TreeModel treeModel = new DefaultTreeModel(root);
                 this.setModel(treeModel);

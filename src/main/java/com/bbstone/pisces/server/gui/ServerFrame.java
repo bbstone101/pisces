@@ -38,27 +38,10 @@ public class ServerFrame extends javax.swing.JFrame {
         jFileChooser1 = new javax.swing.JFileChooser();
         jFileChooser2 = new javax.swing.JFileChooser();
         cardPanel = new javax.swing.JPanel();
-        configPanel = new javax.swing.JPanel();
-        sslEnabledLabel = new javax.swing.JLabel();
-        sslEnabledComboBox = new javax.swing.JComboBox<>();
-        hostLabel = new javax.swing.JLabel();
-        hostTextField = new javax.swing.JTextField();
-        serverDirLabel = new javax.swing.JLabel();
-        portLabel = new javax.swing.JLabel();
-        portTextField = new javax.swing.JTextField();
-        serverDirTextField = new javax.swing.JTextField();
-        clearButton = new javax.swing.JButton();
-        saveButton = new javax.swing.JButton();
-        dirSelectButton = new javax.swing.JButton();
-        infoScrollPane = new javax.swing.JScrollPane();
-        msgTextArea = new javax.swing.JTextArea();
-        msgScrollPane = new javax.swing.JScrollPane();
-        infoTextArea = new javax.swing.JTextArea();
-        resetButton = new javax.swing.JButton();
         transferPanel = new javax.swing.JPanel();
         bottomToolBar = new javax.swing.JToolBar();
         fileTreeScrollPane = new javax.swing.JScrollPane();
-        fileTree = new javax.swing.JTree(TreeNodeBuilder.buildTreeNodes(Config.serverDir, "Server Direotry"));
+        fileTree = new javax.swing.JTree(TreeNodeBuilder.buildTreeNodes(Config.serverDir(), "Server Directory"));
         contentSplitPane = new javax.swing.JSplitPane();
         fileInfoPanel = new javax.swing.JPanel();
         transferLabel = new javax.swing.JLabel();
@@ -76,6 +59,23 @@ public class ServerFrame extends javax.swing.JFrame {
         totalProgressLabel = new javax.swing.JLabel();
         logScrollPane = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        configPanel = new javax.swing.JPanel();
+        sslEnabledLabel = new javax.swing.JLabel();
+        sslEnabledComboBox = new javax.swing.JComboBox<>();
+        hostLabel = new javax.swing.JLabel();
+        hostTextField = new javax.swing.JTextField();
+        serverDirLabel = new javax.swing.JLabel();
+        portLabel = new javax.swing.JLabel();
+        portTextField = new javax.swing.JTextField();
+        serverDirTextField = new javax.swing.JTextField();
+        clearButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
+        dirSelectButton = new javax.swing.JButton();
+        infoScrollPane = new javax.swing.JScrollPane();
+        msgTextArea = new javax.swing.JTextArea();
+        msgScrollPane = new javax.swing.JScrollPane();
+        infoTextArea = new javax.swing.JTextArea();
+        resetButton = new javax.swing.JButton();
         mainMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         configMenuItem = new javax.swing.JMenuItem();
@@ -88,6 +88,123 @@ public class ServerFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         cardPanel.setLayout(new java.awt.CardLayout());
+
+        bottomToolBar.setRollover(true);
+
+        fileTreeScrollPane.setViewportView(fileTree);
+
+        contentSplitPane.setDividerLocation(280);
+        contentSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        transferLabel.setText("Sending:");
+
+        filePathLabel.setText("File Path:");
+
+        fileCatLabel.setText("File Cat: ");
+
+        fileSizeLabel.setText("File Size: ");
+
+        checksumLabel.setText("Checksum: ");
+
+        transferButton.setText("Transfer");
+
+        reloadButton.setText("Reload");
+
+        totalProgressLabel.setText("(0/10)");
+
+        javax.swing.GroupLayout fileInfoPanelLayout = new javax.swing.GroupLayout(fileInfoPanel);
+        fileInfoPanel.setLayout(fileInfoPanelLayout);
+        fileInfoPanelLayout.setHorizontalGroup(
+            fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileInfoPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(fileInfoPanelLayout.createSequentialGroup()
+                        .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(checksumLabel)
+                            .addComponent(fileSizeLabel)
+                            .addComponent(fileCatLabel)
+                            .addComponent(filePathLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(filePathTextField)
+                            .addComponent(fileCatTextField)
+                            .addComponent(fileSizeTextField)
+                            .addComponent(checksumTextField)))
+                    .addGroup(fileInfoPanelLayout.createSequentialGroup()
+                        .addGap(0, 246, Short.MAX_VALUE)
+                        .addComponent(reloadButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(transferButton))
+                    .addGroup(fileInfoPanelLayout.createSequentialGroup()
+                        .addComponent(transferLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(totalProgressLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        fileInfoPanelLayout.setVerticalGroup(
+            fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileInfoPanelLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(jProgressBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(transferLabel)
+                    .addComponent(totalProgressLabel))
+                .addGap(32, 32, 32)
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(filePathLabel)
+                    .addComponent(filePathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fileCatLabel)
+                    .addComponent(fileCatTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fileSizeLabel)
+                    .addComponent(fileSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(checksumLabel)
+                    .addComponent(checksumTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(transferButton)
+                    .addComponent(reloadButton))
+                .addContainerGap())
+        );
+
+        contentSplitPane.setTopComponent(fileInfoPanel);
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        logScrollPane.setViewportView(jTextArea1);
+
+        contentSplitPane.setBottomComponent(logScrollPane);
+
+        javax.swing.GroupLayout transferPanelLayout = new javax.swing.GroupLayout(transferPanel);
+        transferPanel.setLayout(transferPanelLayout);
+        transferPanelLayout.setHorizontalGroup(
+            transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(bottomToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(transferPanelLayout.createSequentialGroup()
+                .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(contentSplitPane)
+                .addContainerGap())
+        );
+        transferPanelLayout.setVerticalGroup(
+            transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, transferPanelLayout.createSequentialGroup()
+                .addGroup(transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
+                    .addComponent(contentSplitPane))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bottomToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        cardPanel.add(transferPanel, "transferCard");
 
         sslEnabledLabel.setText("SSL Enabled: ");
 
@@ -178,7 +295,7 @@ public class ServerFrame extends javax.swing.JFrame {
                             .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(sslEnabledComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 403, Short.MAX_VALUE))
                     .addComponent(infoScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, configPanelLayout.createSequentialGroup()
                         .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -187,7 +304,7 @@ public class ServerFrame extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(serverDirTextField))
                             .addGroup(configPanelLayout.createSequentialGroup()
-                                .addGap(0, 461, Short.MAX_VALUE)
+                                .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(clearButton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -226,127 +343,11 @@ public class ServerFrame extends javax.swing.JFrame {
                     .addComponent(resetButton))
                 .addGap(18, 18, 18)
                 .addComponent(infoScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         cardPanel.add(configPanel, "configCard");
-
-        bottomToolBar.setRollover(true);
-
-        fileTreeScrollPane.setViewportView(fileTree);
-
-        contentSplitPane.setDividerLocation(280);
-        contentSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-
-        transferLabel.setText("Sending:");
-
-        filePathLabel.setText("File Path:");
-
-        fileCatLabel.setText("File Cat: ");
-
-        fileSizeLabel.setText("File Size: ");
-
-        checksumLabel.setText("Checksum: ");
-
-        transferButton.setText("Transfer");
-
-        reloadButton.setText("Reload");
-
-        totalProgressLabel.setText("(0/10)");
-
-        javax.swing.GroupLayout fileInfoPanelLayout = new javax.swing.GroupLayout(fileInfoPanel);
-        fileInfoPanel.setLayout(fileInfoPanelLayout);
-        fileInfoPanelLayout.setHorizontalGroup(
-            fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(fileInfoPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jProgressBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(fileInfoPanelLayout.createSequentialGroup()
-                        .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(checksumLabel)
-                            .addComponent(fileSizeLabel)
-                            .addComponent(fileCatLabel)
-                            .addComponent(filePathLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(filePathTextField)
-                            .addComponent(fileCatTextField)
-                            .addComponent(fileSizeTextField)
-                            .addComponent(checksumTextField)))
-                    .addGroup(fileInfoPanelLayout.createSequentialGroup()
-                        .addGap(0, 340, Short.MAX_VALUE)
-                        .addComponent(reloadButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(transferButton))
-                    .addGroup(fileInfoPanelLayout.createSequentialGroup()
-                        .addComponent(transferLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(totalProgressLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-        );
-        fileInfoPanelLayout.setVerticalGroup(
-            fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(fileInfoPanelLayout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jProgressBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(transferLabel)
-                    .addComponent(totalProgressLabel))
-                .addGap(32, 32, 32)
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(filePathLabel)
-                    .addComponent(filePathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(fileCatLabel)
-                    .addComponent(fileCatTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(fileSizeLabel)
-                    .addComponent(fileSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(checksumLabel)
-                    .addComponent(checksumTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
-                .addGroup(fileInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(transferButton)
-                    .addComponent(reloadButton))
-                .addContainerGap())
-        );
-
-        contentSplitPane.setTopComponent(fileInfoPanel);
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        logScrollPane.setViewportView(jTextArea1);
-
-        contentSplitPane.setBottomComponent(logScrollPane);
-
-        javax.swing.GroupLayout transferPanelLayout = new javax.swing.GroupLayout(transferPanel);
-        transferPanel.setLayout(transferPanelLayout);
-        transferPanelLayout.setHorizontalGroup(
-            transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bottomToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(transferPanelLayout.createSequentialGroup()
-                .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentSplitPane)
-                .addContainerGap())
-        );
-        transferPanelLayout.setVerticalGroup(
-            transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, transferPanelLayout.createSequentialGroup()
-                .addGroup(transferPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(fileTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
-                    .addComponent(contentSplitPane))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bottomToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        cardPanel.add(transferPanel, "transferCard");
+        initConfigFormData();
 
         fileMenu.setText("File");
 
@@ -399,9 +400,15 @@ public class ServerFrame extends javax.swing.JFrame {
             .addComponent(cardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        showTransferCard();
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void showTransferCard() {
+        CardLayout cardLayout = (CardLayout)cardPanel.getLayout();
+        cardLayout.show(cardPanel, "transferCard");
+    }
     private void sslEnabledComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sslEnabledComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_sslEnabledComboBoxActionPerformed
@@ -440,6 +447,13 @@ public class ServerFrame extends javax.swing.JFrame {
         // TODO read default config from config.properties
         // clear msg text
         this.msgTextArea.setText(null);
+        // 
+        String selectedItem = Config.sslEnabled() ? Config.ENABLED : Config.DISABLED;
+        this.sslEnabledComboBox.setSelectedItem(selectedItem);
+        this.hostTextField.setText(Config.host());
+        this.portTextField.setText(String.valueOf(Config.port()));
+        this.serverDirTextField.setText(Config.serverDir());
+        
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
@@ -459,9 +473,27 @@ public class ServerFrame extends javax.swing.JFrame {
         }
         // do save procedure
         
+        // do save procedure
+        String sslEnabled = (String)this.sslEnabledComboBox.getSelectedItem();
+        String host = StringUtils.trim(this.hostTextField.getText());
+        String port = StringUtils.trim(this.portTextField.getText());
+        String serverDir = StringUtils.trim(this.serverDirTextField.getText());
+        Config.setProperty(Config.SSL_ENABLED_KEY, StringUtils.equalsIgnoreCase(Config.ENABLED, sslEnabled) ? Config.TRUE : Config.FALSE);
+        Config.setProperty(Config.SERVER_HOST_KEY, host);
+        Config.setProperty(Config.SERVER_PORT_KEY, port);
+        Config.setProperty(Config.SERVER_DIR_KEY, serverDir);
+        Config.saveUpdate(); // batch save changes to file
+        
+        this.msgTextArea.setText("configurtion saved OK.");
     }//GEN-LAST:event_saveButtonActionPerformed
 
-    
+    private void initConfigFormData() {
+        String selectedItem = Config.sslEnabled() ? Config.ENABLED : Config.DISABLED;
+        this.sslEnabledComboBox.setSelectedItem(selectedItem);
+        this.hostTextField.setText(Config.host());
+        this.portTextField.setText(String.valueOf(Config.port()));
+        this.serverDirTextField.setText(Config.serverDir());
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;

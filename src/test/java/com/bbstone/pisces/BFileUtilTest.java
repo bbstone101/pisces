@@ -2,6 +2,7 @@ package com.bbstone.pisces;
 
 import com.alibaba.fastjson.JSON;
 import com.bbstone.pisces.comm.BFileInfo;
+import com.bbstone.pisces.comm.BFileTreeNode;
 import com.bbstone.pisces.util.BByteUtil;
 import com.bbstone.pisces.util.BFileUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -78,9 +79,19 @@ public class BFileUtilTest {
 //        String path = "D:/aa/bb/c.txt";
 //        System.out.println(BFileUtil.convertToLocalePath(path));
 
-        List<BFileInfo> fileInfoList = BFileUtil.findServerFiles("/Users/bbstone/Downloads/pisces");
-        for (BFileInfo fileInfo : fileInfoList) {
-            System.out.println(JSON.toJSONString(fileInfo));
+//        List<BFileInfo >fileInfoList = BFileUtil.findServerFiles("/Users/bbstone/Downloads/pisces");
+//        for (BFileInfo fileInfo : fileInfoList) {
+//            System.out.println(JSON.toJSONString(fileInfo));
+//        }
+        BFileTreeNode root = BFileUtil.findServerFileTree("/Users/bbstone/Downloads/pisces");
+        traversalNode(root);
+
+    }
+
+    public static void traversalNode(BFileTreeNode node) {
+        log.info("abspath: {}, name: {}, fileCat: {}", node.getAbsolutePath(), node.getName(), node.getFileCat());
+        for (BFileTreeNode n : node.getChildren()) {
+            traversalNode(n);
         }
     }
 

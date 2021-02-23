@@ -30,6 +30,7 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.CharsetUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
@@ -39,36 +40,29 @@ import java.io.File;
  * traffic between the echo client and server by sending the first message to
  * the server.
  */
+@Slf4j
 public final class FileClient {
-    /*
-        static final boolean SSL = System.getProperty("ssl") != null;
-        static final String HOST = System.getProperty("host", "127.0.0.1");
-        static final int PORT = Integer.parseInt(System.getProperty("port", "8080"));
-        static final int SIZE = Integer.parseInt(System.getProperty("size", "256"));
-        */
-    static final boolean SSL = Config.sslEnabled;
-    static final String HOST = Config.host;
-    static final int PORT = Config.port;
+//    static final boolean SSL = Config.sslEnabled();
+//    static final String HOST = Config.host();
+//    static final int PORT = Config.port();
 
-    public static void main(String[] args) throws Exception {
-        ClientCmdRegister.init();
-//        ClientCache.cleanAll();
-        // Configure SSL.
-        final SslContext sslCtx;
-        if (SSL) {
-//            SelfSignedCertificate ssc = new SelfSignedCertificate();
-//            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-
-            File certChainFile = Config.clientSSLCertChainFile;
-            File keyFile = Config.clientSSLKeyFile;
-            File rootFile = Config.clientSSLRootFile;
-            sslCtx = SslContextBuilder.forClient().keyManager(certChainFile, keyFile).trustManager(rootFile).build();
-        } else {
-            sslCtx = null;
-        }
+    public void startup() {
         // Configure the client.
         EventLoopGroup group = new NioEventLoopGroup();
         try {
+            ClientCmdRegister.init();
+//          ClientCache.cleanAll();
+            // Configure SSL.
+            final SslContext sslCtx;
+            if (Config.sslEnabled()) {
+                File certChainFile = Config.clientSSLCertChainFile();
+                File keyFile = Config.clientSSLKeyFile();
+                File rootFile = Config.clientSSLRootFile();
+                sslCtx = SslContextBuilder.forClient().keyManager(certChainFile, keyFile).trustManager(rootFile).build();
+            } else {
+                sslCtx = null;
+            }
+
             Bootstrap b = new Bootstrap();
             b.group(group)
                     .channel(NioSocketChannel.class)
@@ -99,11 +93,14 @@ public final class FileClient {
 
 
             // Start the client.
-            ChannelFuture f = b.connect(HOST, PORT).sync();
+            ChannelFuture f = b.connect(Config.host(), Config.port()).sync();
 
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
-        } finally {
+        } catch (Exception e) {
+            log.error("startup client error.", e);
+        }
+        finally {
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
         }

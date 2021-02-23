@@ -6,6 +6,7 @@
 package com.bbstone.pisces.client.gui;
 
 import com.bbstone.pisces.server.gui.*;
+import javax.swing.UIManager;
 
 /**
  *
@@ -23,12 +24,16 @@ public class Startup {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
+            /*
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                // Nimbus cross-platform look and feel 
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
-            }
+            }*/
+//            javax.swing.UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // metal
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(ServerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -42,12 +47,14 @@ public class Startup {
 
         // 让Swing菜单显示在mac顶部菜单栏
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Pisces");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "PiscesClient");
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ClientFrame mainFrame = new ClientFrame();
+//                ClientFrame mainFrame = new ClientFrame();
+                
+                ClientMainFrame mainFrame = new ClientMainFrame();
                 mainFrame.setVisible(true);
                 // 主窗口居中打开
                 mainFrame.setLocationRelativeTo(null);

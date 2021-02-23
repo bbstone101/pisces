@@ -1,6 +1,7 @@
 package com.bbstone.pisces.client.base;
 
 import com.bbstone.pisces.client.task.impl.FileTask;
+import com.bbstone.pisces.comm.BFileCombo;
 import com.bbstone.pisces.comm.BFileInfo;
 import com.bbstone.pisces.proto.BFileMsg;
 import com.bbstone.pisces.util.BFileUtil;
@@ -19,6 +20,7 @@ public class ClientCache {
      **/
     private static Map<String, BFileInfo> serverFiles = new HashMap<>();
 
+    private static BFileCombo combo = null;
     /** current running Tasks, key: BFileReq.id=reqId */
     private static Map<String, FileTask> runningTasks = new HashedMap();
 
@@ -83,8 +85,9 @@ public class ClientCache {
      *     filepath - relative to server.dir
      * @param fileList
      */
-    public static void init(List<BFileInfo> fileList) {
+    public static void init(BFileCombo combo, List<BFileInfo> fileList) {
         serverFiles.clear();
+        combo = combo;
         for (BFileInfo file : fileList) {
             serverFiles.put(BFileUtil.getReqId(file.getFilepath()), file);
         }
@@ -112,6 +115,9 @@ public class ClientCache {
         runningTasks.remove(id);
     }
 
+    public static BFileCombo getCombo() {
+        return combo;
+    }
 
     public static void cleanAll() {
         recvFileKey = null;

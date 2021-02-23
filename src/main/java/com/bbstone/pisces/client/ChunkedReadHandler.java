@@ -21,7 +21,7 @@ public class ChunkedReadHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         // incoming chunked file
-        if (Config.sslEnabled && StringUtils.isNotBlank(ClientCache.currRecvFileKey())) {
+        if (Config.sslEnabled() && StringUtils.isNotBlank(ClientCache.currRecvFileKey())) {
             // ----- chunked file data arrival
             log.info("currRecvFileKey: {}", ClientCache.currRecvFileKey());
             BFileMsg.BFileRsp rsp = ClientCache.getRspInfo(ClientCache.currRecvFileKey());
