@@ -113,7 +113,7 @@ C:\> server.bat
 ```
 ## Window
 ```
-# cd pisces\
+# cd pisces\bin
 # client.bat
 ```
 
