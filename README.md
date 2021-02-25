@@ -96,24 +96,24 @@ server.dir=/Users/bbstone/Downloads/pisces/
 # 启动server
 ## *nix
 ```
-# cd pisces
+# cd pisces/bin
 # ./server.sh
 ```
 ## Window
 ```
-C:\> cd pisces
+C:\> cd pisces\bin
 C:\> server.bat
 ```
 
 # 启动client
 ## *nix
 ```
-# cd pisces
+# cd pisces/bin
 # ./client.sh
 ```
 ## Window
 ```
-# cd pisces
+# cd pisces\
 # client.bat
 ```
 
